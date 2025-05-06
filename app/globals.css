@@ -19,8 +19,23 @@
   }
 }
 
-body {
-  background: var(--background);
+/* Apply background to all elements except the banner section */
+html, body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+body > div > div:not(:first-child) {
+  background: url('/site-background.jpeg') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Ensure video can show through in the banner section */
+.video-background {
+  z-index: 0;
+}
+
+.bg-white, .bg-gray-50 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
 }
