@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import './videoUrlBuilder.css';
 
-export default function VideoUrlBuilder() {
+// Component that handles all the URL building functionality
+function UrlBuilderContent() {
   const [formData, setFormData] = useState({
     meetingId: '',
     passcode: '',
@@ -13,6 +14,12 @@ export default function VideoUrlBuilder() {
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
   const [zoomUrl, setZoomUrl] = useState('');
+  const [baseUrl, setBaseUrl] = useState('');
+
+  // Set the base URL on client-side only
+  useEffect(() => {
+    setBaseUrl(`${window.location.origin}/video-chat`);
+  }, []);
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -52,52 +59,35 @@ export default function VideoUrlBuilder() {
         }
       }
       
-      // If no meeting ID found in path, check query params
-      if (!extractedMeetingId && url.searchParams.get('meetingId')) {
-        extractedMeetingId = url.searchParams.get('meetingId');
-      }
+      // Extract passcode from query parameters
+      const searchParams = new URLSearchParams(url.search);
+      let extractedPasscode = searchParams.get('pwd') || '';
       
-      if (!extractedMeetingId) {
+      // Update form data with extracted information
+      if (extractedMeetingId) {
+        setFormData({
+          ...formData,
+          meetingId: extractedMeetingId,
+          passcode: extractedPasscode
+        });
+      } else {
         alert('Could not extract meeting ID from the URL');
-        return;
       }
-      
-      // Extract password from query params
-      // It could be pwd or passcode
-      let extractedPasscode = url.searchParams.get('pwd') || url.searchParams.get('passcode') || '';
-      
-      // Some Zoom URLs have the password in a different format like "pwd=abc123.1"
-      // We need to handle this case by removing the ".1" suffix if present
-      if (extractedPasscode.includes('.')) {
-        extractedPasscode = extractedPasscode.split('.')[0];
-      }
-      
-      // Update form data
-      setFormData({
-        ...formData,
-        meetingId: extractedMeetingId,
-        passcode: extractedPasscode
-      });
-      
-      // Clear the Zoom URL input
-      setZoomUrl('');
-      
     } catch (error) {
-      console.error('Error parsing Zoom URL:', error);
-      alert('Invalid Zoom URL format');
+      alert('Invalid URL format');
+      console.error('Error parsing URL:', error);
     }
   };
 
-  // Generate the URL
+  // Generate URL from form data
   const generateUrl = (e) => {
     e.preventDefault();
     
     if (!formData.meetingId) {
-      alert('Please enter a Meeting ID');
+      alert('Meeting ID is required');
       return;
     }
     
-    const baseUrl = `${window.location.origin}/video-chat`;
     let url = `${baseUrl}?meetingId=${formData.meetingId}`;
     
     if (formData.passcode) {
@@ -149,6 +139,7 @@ export default function VideoUrlBuilder() {
     for (let i = 0; i < 6; i++) {
       newPasscode += characters.charAt(Math.floor(Math.random() * characters.length));
     }
+    
     setFormData({
       ...formData,
       passcode: newPasscode
@@ -201,13 +192,13 @@ export default function VideoUrlBuilder() {
                   type="button" 
                   className="generate-button"
                   onClick={generateRandomMeetingId}
-                  title="Generate Random Meeting ID"
+                  title="Generate Random ID"
                 >
-                  Generate
+                  Random
                 </button>
               </div>
             </div>
-
+            
             <div className="form-group">
               <label htmlFor="passcode">Passcode</label>
               <div className="input-with-button">
@@ -217,7 +208,7 @@ export default function VideoUrlBuilder() {
                   name="passcode"
                   value={formData.passcode}
                   onChange={handleInputChange}
-                  placeholder="Enter Passcode (Optional)"
+                  placeholder="Enter Passcode (optional)"
                 />
                 <button 
                   type="button" 
@@ -225,23 +216,23 @@ export default function VideoUrlBuilder() {
                   onClick={generateRandomPasscode}
                   title="Generate Random Passcode"
                 >
-                  Generate
+                  Random
                 </button>
               </div>
             </div>
-
+            
             <div className="form-group">
-              <label htmlFor="userName">Participant Name</label>
+              <label htmlFor="userName">Default User Name</label>
               <input
                 type="text"
                 id="userName"
                 name="userName"
                 value={formData.userName}
                 onChange={handleInputChange}
-                placeholder="Enter Participant Name (Optional)"
+                placeholder="Enter default user name (optional)"
               />
             </div>
-
+            
             <div className="form-group">
               <label htmlFor="notes">Notes</label>
               <textarea
@@ -297,5 +288,28 @@ export default function VideoUrlBuilder() {
         )}
       </div>
     </div>
+  );
+}
+
+// Loading component
+function UrlBuilderLoading() {
+  return (
+    <div className="url-builder-container pt-20 pb-16 flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+        </div>
+        <p className="mt-2">Loading URL builder...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function VideoUrlBuilder() {
+  return (
+    <Suspense fallback={<UrlBuilderLoading />}>
+      <UrlBuilderContent />
+    </Suspense>
   );
 }
