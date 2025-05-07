@@ -36,11 +36,11 @@
 /* Mobile-specific adjustments */
 @media screen and (max-width: 768px) {
   .video-chat-wrapper {
-    height: 100vh;
+    height: calc(100vh - 60px); /* Reduce height by 60px to account for mobile browser bars */
   }
   
   .video-container {
-    min-height: 250px;
+    min-height: 200px;
   }
 }
 

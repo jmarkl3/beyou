@@ -13,6 +13,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import "./videoChat.css"
+import isMobile from 'ismobile';
 
 // Create a client component that uses useSearchParams
 function VideoMeeting() {
@@ -84,8 +85,11 @@ function VideoMeeting() {
         }
     }, [searchParams]);
     
+    // Apply conditional styling based on device type
+    const wrapperStyle = isMobile ? { height: 'calc(100vh - 60px)' } : {};
+    
     return (
-        <div className="video-chat-wrapper">
+        <div className="video-chat-wrapper" style={wrapperStyle}>
             <div className="video-content">
             {meetingId && (
                 <>
@@ -131,8 +135,11 @@ function VideoMeeting() {
 
 // Loading fallback component
 function VideoMeetingLoading() {
+    // Apply conditional styling based on device type
+    const wrapperStyle = isMobile ? { height: 'calc(100vh - 60px)' } : {};
+    
     return (
-        <div className="video-chat-wrapper">
+        <div className="video-chat-wrapper" style={wrapperStyle}>
             <div className="video-content flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
