@@ -47,17 +47,17 @@ function VideoMeeting() {
     }, [searchParams]);
     
     return (
-        <div className="pt-16 pb-4">
-            <div style={{width: "100%", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px"}}>
+        <div style={{paddingTop: "64px"}}>
+            <div style={{width: "100%", padding: "5px"}}>
             {meetingId && (
                 <>
-                    <div style={{height: "calc(100vh - 100px)", minHeight: "600px"}}>
+                    <div style={{height: "calc(100vh - 130px)"}}>
                         <iframe
                             src={zoomUrl}
                             width="100%" 
                             height="100%"
                             allow="microphone; camera; fullscreen"
-                            style={{ border: 'none', minHeight: '600px' }}
+                            style={{ border: 'none' }}
                         />
                     </div>
                     <div className="audio-troubleshoot-button">
@@ -89,8 +89,8 @@ function VideoMeeting() {
 // Loading fallback component
 function VideoMeetingLoading() {
     return (
-        <div className="pt-16 pb-4">
-            <div style={{height: "calc(100vh - 100px)", width: "100%"}} className="flex items-center justify-center">
+        <div style={{paddingTop: "64px"}}>
+            <div style={{height: "calc(100vh - 130px)", width: "100%"}} className="flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
                         <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
