@@ -161,7 +161,7 @@ export default function Home() {
 
         
         {/* Services section with rectangles */}
-        <div id="our-services" className="parallax-background">
+        <div id="our-services" className="parallax-background relative z-10">
           <div
             className="max-w-full-content mx-auto bg-transparent p-5"
           >
@@ -169,93 +169,94 @@ export default function Home() {
               Our Services
             </h2>
 
-            <div className="mx-auto flex flex-wrap my-3 m-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {/* Free Consultation */}
-              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
-                <div className="p-6 pb-20 text-center h-full">
-                  <a
-                    href="https://calendly.com/abeapple/free-consultation"
-                    className="font-bold text-xl hover:text-gray-700"
-                  >
-                    Free Consultation
-                  </a>
-                  <p className="text-sm mt-2">Meet and Test Methods</p>
-                  <div className="border-top border border-black w-full my-6"></div>
-                  <p className="text-gray-700 text-base">$0</p>
-                  <p className="text-gray-700 text-base">60 min</p>
+            <div className="mx-auto flex flex-wrap my-3 m-auto max-w-[1000px]">
+              
+              {/* Service Cards Container */}
+              <div className="w-full flex flex-wrap justify-center gap-6">
+                
+                {/* Free Consultation */}
+                <div className="w-full sm:w-[calc(50%-12px)] rounded-none overflow-hidden mx-auto border-8 border-black relative min-h-[300px] mb-6 z-10">
+                  <div className="p-6 pb-20 text-center h-full">
+                    <a
+                      className="font-bold text-xl hover:text-gray-700"
+                    >
+                      Free Consultation
+                    </a>
+                    <p className="text-sm mt-2">Meet and Test Methods</p>
+                    <div className="border-top border border-black w-full my-6"></div>
+                    <p className="text-gray-700 text-base">$0</p>
+                    <p className="text-gray-700 text-base">60 min</p>
+                  </div>
+                  <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
+                    <a href="https://calendly.com/abeapple/free-consultation" className="btn-main">
+                      Book Now
+                    </a>
+                  </div>
                 </div>
-                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
-                  <a href="/calendar/free-consultation" className="btn-main">
-                    Book Now
-                  </a>
-                </div>
-              </div>
 
-              {/* Individual Session */}
-              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
-                <div className="p-6 pb-20 text-center h-full">
-                  <a
-                    href="/service/individual-session"
-                    className="font-bold text-xl hover:text-gray-700"
-                  >
-                    Individual Session
-                  </a>
-                  <p className="text-sm mt-2">One-on-one sessions</p>
-                  <div className="border-top border border-black w-full my-6"></div>
-                  <p className="text-gray-700 text-base">$0 - $25 - $200</p>
-                  <p className="text-gray-700 text-base">60-90 min</p>
+                {/* Individual Session */}
+                <div className="w-full sm:w-[calc(50%-12px)] rounded-none overflow-hidden mx-auto border-8 border-black relative min-h-[300px] mb-6 z-10">
+                  <div className="p-6 pb-20 text-center h-full">
+                    <a
+                      className="font-bold text-xl hover:text-gray-700"
+                    >
+                      Individual Session
+                    </a>
+                    <p className="text-sm mt-2">One-on-one sessions</p>
+                    <div className="border-top border border-black w-full my-6"></div>
+                    <p className="text-gray-700 text-base">$0 - $25 - $200</p>
+                    <p className="text-gray-700 text-base">60-90 min</p>
+                  </div>
+                  <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
+                    <a 
+                      href={"https://calendly.com/abeapple/one-on-one-session"} 
+                      className="btn-main">
+                      Book Now
+                    </a>
+                  </div>
                 </div>
-                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
-                  <a 
-                    href={"https://calendly.com/abeapple/one-on-one-session"} 
-                    className="btn-main">
-                    Book Now
-                  </a>
+                
+                {/* Group Session */}
+                <div className="w-full sm:w-[calc(50%-12px)] rounded-none overflow-hidden mx-auto border-8 border-black relative min-h-[300px] mb-6 z-10">
+                  <div className="p-6 pb-20 text-center h-full">
+                    <a
+                      className="font-bold text-xl hover:text-gray-700"
+                    >
+                      Group Session
+                    </a>
+                    <p className="text-sm mt-2">Small group sessions</p>
+                    <div className="border-top border border-black w-full my-6"></div>
+                    <p className="text-gray-700 text-base">$0 - $25 - 200</p>
+                    <p className="text-gray-700 text-base">90 min</p>
+                  </div>
+                  <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
+                    <a href="https://calendly.com/abeapple/group-session" className="btn-main">
+                      Book Now
+                    </a>
+                  </div>
                 </div>
-              </div>
 
-              {/* Group Session */}
-              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
-                <div className="p-6 pb-20 text-center h-full">
-                  <a
-                    href="https://calendly.com/abeapple/group-session"
-                    className="font-bold text-xl hover:text-gray-700"
-                  >
-                    Group Session
-                  </a>
-                  <p className="text-sm mt-2">Small group sessions</p>
-                  <div className="border-top border border-black w-full my-6"></div>
-                  <p className="text-gray-700 text-base">$0 - $25 - 200</p>
-                  <p className="text-gray-700 text-base">90 min</p>
-                </div>
-                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
-                  <a href="/calendar/group-session" className="btn-main">
-                    Book Now
-                  </a>
-                </div>
-              </div>
-
-              {/* Assessment */}
-              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
-                <div className="p-6 pb-20 text-center h-full">
-                  <a
-                    href="/service/free-consultation"
-                    className="font-bold text-xl hover:text-gray-700"
-                  >
-                    Assessment
-                  </a>
-                  <p className="text-sm mt-2">Discover yourself</p>
-                  <div className="border-top border border-black w-full my-6"></div>
-                  <p className="text-gray-700 text-base">$0</p>
-                  <p className="text-gray-700 text-base">30 min</p>
-                </div>
-                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
-                  <a 
-                    href="https://calendly.com/abeapple/30min" 
-                    className="btn-main"
-                  >
-                    Book Now
-                  </a>
+                {/* Assessment */}
+                <div className="w-full sm:w-[calc(50%-12px)] rounded-none overflow-hidden mx-auto border-8 border-black relative min-h-[300px] mb-6 z-10">
+                  <div className="p-6 pb-20 text-center h-full">
+                    <a
+                      className="font-bold text-xl hover:text-gray-700"
+                    >
+                      Assessment
+                    </a>
+                    <p className="text-sm mt-2">Discover yourself</p>
+                    <div className="border-top border border-black w-full my-6"></div>
+                    <p className="text-gray-700 text-base">$0</p>
+                    <p className="text-gray-700 text-base">30 min</p>
+                  </div>
+                  <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
+                    <a 
+                      href="https://calendly.com/abeapple/30min" 
+                      className="btn-main"
+                    >
+                      Book Now
+                    </a>
+                  </div>
                 </div>
               </div>
 
