@@ -28,9 +28,9 @@ export default function Home() {
         <div className="w-full text-center absolute bottom-5" style={{ zIndex: 2 }}>
           <a
             className="btn-main"
-            href="/book-now"
+            href="https://calendly.com/abeapple/free-consultation"
           >
-            Book Now
+            Claim Your Free Consultation
           </a>
         </div>
       </div>
@@ -83,8 +83,8 @@ export default function Home() {
             </div>
             
             <div className="flex my-8 justify-center">
-              <a className="btn-main" href="/contact">
-                Schedule Assessment
+              <a className="btn-main" href="https://calendly.com/abeapple/30min">
+                Free Assessment
               </a>
             </div>
           </div>
@@ -170,32 +170,11 @@ export default function Home() {
             </h2>
 
             <div className="mx-auto flex flex-wrap my-3 m-auto grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {/* Individual Session */}
-              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
-                <div className="p-6 pb-20 text-center h-full">
-                  <a
-                    href="/service/individual-session"
-                    className="font-bold text-xl hover:text-gray-700"
-                  >
-                    Individual Session
-                  </a>
-                  <p className="text-sm mt-2">One-on-one coaching sessions</p>
-                  <div className="border-top border border-black w-full my-6"></div>
-                  <p className="text-gray-700 text-base">$200</p>
-                  <p className="text-gray-700 text-base">60 min</p>
-                </div>
-                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
-                  <a href="/calendar/individual-session" className="btn-main">
-                    Book Now
-                  </a>
-                </div>
-              </div>
-
               {/* Free Consultation */}
               <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
                 <div className="p-6 pb-20 text-center h-full">
                   <a
-                    href="/service/free-consultation"
+                    href="https://calendly.com/abeapple/free-consultation"
                     className="font-bold text-xl hover:text-gray-700"
                   >
                     Free Consultation
@@ -212,18 +191,41 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Individual Session */}
+              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
+                <div className="p-6 pb-20 text-center h-full">
+                  <a
+                    href="/service/individual-session"
+                    className="font-bold text-xl hover:text-gray-700"
+                  >
+                    Individual Session
+                  </a>
+                  <p className="text-sm mt-2">One-on-one coaching sessions</p>
+                  <div className="border-top border border-black w-full my-6"></div>
+                  <p className="text-gray-700 text-base">$0 - $25 - $200</p>
+                  <p className="text-gray-700 text-base">60-90 min</p>
+                </div>
+                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
+                  <a 
+                    href={"https://calendly.com/abeapple/one-on-one-session"} 
+                    className="btn-main">
+                    Book Now
+                  </a>
+                </div>
+              </div>
+
               {/* Group Session */}
               <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
                 <div className="p-6 pb-20 text-center h-full">
                   <a
-                    href="/service/group-session"
+                    href="https://calendly.com/abeapple/group-session"
                     className="font-bold text-xl hover:text-gray-700"
                   >
                     Group Session
                   </a>
                   <p className="text-sm mt-2">Small group coaching sessions</p>
                   <div className="border-top border border-black w-full my-6"></div>
-                  <p className="text-gray-700 text-base">$200</p>
+                  <p className="text-gray-700 text-base">$0 - $25 - 200</p>
                   <p className="text-gray-700 text-base">90 min</p>
                 </div>
                 <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
@@ -232,23 +234,48 @@ export default function Home() {
                   </a>
                 </div>
               </div>
+
+              {/* Assessment */}
+              <div className="w-full rounded-none overflow-hidden mx-auto border-8 border-black relative h-full min-h-[300px]">
+                <div className="p-6 pb-20 text-center h-full">
+                  <a
+                    href="/service/free-consultation"
+                    className="font-bold text-xl hover:text-gray-700"
+                  >
+                    Assessment
+                  </a>
+                  <p className="text-sm mt-2">Discover yourself</p>
+                  <div className="border-top border border-black w-full my-6"></div>
+                  <p className="text-gray-700 text-base">$0</p>
+                  <p className="text-gray-700 text-base">30 min</p>
+                </div>
+                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
+                  <a 
+                    href="https://calendly.com/abeapple/30min" 
+                    className="btn-main"
+                  >
+                    Book Now
+                  </a>
+                </div>
+              </div>
+
             </div>
 
-            <div className="flex my-8 justify-center">
+            {/* <div className="flex my-8 justify-center">
               <a className="btn-main" href="/book-now">
                 More Services
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
 
 
         {/* Three-column grid section */}
-        <div id="contact" className="w-full bg-gray-50 h-full relative py-16">
-          <div className="max-w-full-content mx-auto h-full px-5">
+        <div id="contact" className="w-full bg-gray-50 h-full relative py-2.5">
+          <div className="max-w-full-content mx-auto h-full px-8 md:px-12">
             <div className="text-center mb-12">
-              <div className="header-line my-8 mx-auto"></div>
-              <h2 className="mb-7 mt-10 tracking-tighter title">Our Process</h2>
+              <div className="header-line mb-6 mx-auto"></div>
+              <h2 className="mb-7 tracking-tighter title text-3xl md:text-4xl font-bold">Our Process</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -289,11 +316,11 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="text-center mt-12">
+            {/* <div className="text-center mt-12">
               <a href="/about-me" className="btn-main">
                 Learn More
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

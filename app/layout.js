@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "BeYou - Mental Transformation",
+  title: "BeYou365 - Mental Transformation",
   description: "Circuit-Based Approach to Mental Transformation",
 };
 

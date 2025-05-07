@@ -12,43 +12,19 @@ export default function BottomNav() {
 
   // Contact information
   const contactInfo = [
-    { label: 'Phone', value: '(555) 123-4567' },
-    { label: 'Email', value: 'info@beyou.com' },
-    { label: 'Address', value: '123 Wellness Ave, San Francisco, CA 94101' },
-    { label: 'Hours', value: 'Mon-Fri: 9am-5pm' }
+    { label: 'Phone', value: '(727) 500-5075' },
+    { label: 'Email', value: 'contact@BeYou365.com' },
+    // { label: 'Address', value: '123 Wellness Ave, San Francisco, CA 94101' },
+    { label: 'Core Hours', value: 'Mon-Fri: 9am-5pm' },
+    { label: 'Text Hours', value: '24/7' }
   ];
 
   return (
     <footer className="bg-[rgb(87,187,191)] bg-opacity-50 text-white py-10">
-      <div className="max-w-full-content mx-auto px-5">
+      <div className="max-w-full-content mx-auto px-8 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column - Logo and Quick Links */}
-          <div>
-            <Link href="/" className="inline-block mb-6">
-              <span className="text-2xl font-bold">BeYou</span>
-            </Link>
-            
-            <div className="mb-4">Your partner in mental transformation</div>
-            
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
-              <ul className="space-y-2">
-                {navItems.map((item) => (
-                  <li key={item.id}>
-                    <a 
-                      href={`/#${item.id}`} 
-                      className="hover:underline"
-                    >
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          
-          {/* Right Column - Contact Information */}
-          <div>
+                   {/* Right Column - Contact Information */}
+                   <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3">
               {contactInfo.map((item, index) => (
@@ -83,10 +59,36 @@ export default function BottomNav() {
               </div>
             </div>
           </div>
+         
+          {/* Left Column - Logo and Quick Links */}
+          <div>
+            <Link href="/" className="inline-block mb-6">
+              <span className="text-2xl font-bold">BeYou365</span>
+            </Link>
+            
+            <div className="mb-4">Your partner in mental transformation</div>
+            
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
+              <ul className="space-y-2">
+                {navItems.map((item) => (
+                  <li key={item.id}>
+                    <a 
+                      href={`/#${item.id}`} 
+                      className="hover:underline"
+                    >
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          
         </div>
         
         <div className="border-t border-white/20 mt-10 pt-6 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} BeYou. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} BeYou365. All rights reserved.</p>
         </div>
       </div>
     </footer>
