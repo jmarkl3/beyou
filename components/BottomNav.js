@@ -15,7 +15,7 @@ export default function BottomNav() {
     { label: 'Phone', value: '(727) 500-5075' },
     { label: 'Email', value: 'contact@BeYou365.com' },
     // { label: 'Address', value: '123 Wellness Ave, San Francisco, CA 94101' },
-    { label: 'Core Hours', value: 'Mon-Fri: 9am-5pm' },
+    { label: 'Core Hours', value: 'Mon-Fri: 9am-8pm' },
     { label: 'Text Hours', value: '24/7' }
   ];
 

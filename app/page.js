@@ -30,7 +30,7 @@ export default function Home() {
             className="btn-main"
             href="https://calendly.com/abeapple/free-consultation"
           >
-            Claim Your Free Consultation
+            Free Consultation
           </a>
         </div>
       </div>
@@ -53,11 +53,11 @@ export default function Home() {
             
         {/* Focus Areas Section - Updated with parallax background */}
         <div id="focus-areas" className="parallax-background">
-          <div className="max-w-full-content mx-auto bg-transparent p-5">
+          <div className="max-w-full-content mx-auto bg-transparent px-1 sm:p-5">
             <h2 className="text-center font-bold text-2xl pb-5">
               Focus Areas
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-4xl mx-auto bg-white/80 p-6 rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-4xl mx-auto bg-white/80 p-2 sm:p-6 rounded-lg">
               {/* Focus area checkboxes */}
               {[
                 'Anxiety', 
@@ -91,7 +91,7 @@ export default function Home() {
         </div>
 
         {/* Methods Section (combining Our Methods and EMD) */}
-        <div className="w-full bg-gray-50 h-full relative py-16">
+        <div className="w-full bg-gray-50 h-full relative py-5">
           <div className="max-w-full-content mx-auto h-full px-5">            
             <div className="text-center max-w-4xl mx-auto">
               <h2 className="text-4xl font-bold mb-6">Our Methods</h2>
@@ -110,7 +110,7 @@ export default function Home() {
         </div>
         
         {/* Circuit Based Approach Section */}
-        <div id="circuit-based-approach" className="w-full bg-white h-full relative py-16">
+        <div id="circuit-based-approach" className="w-full bg-white h-full relative">
           <div className="max-w-full-content mx-auto h-full px-5">            
             <div className="text-center max-w-4xl mx-auto">
               <p className="text-green-600 font-cursive text-3xl mb-8">
@@ -148,7 +148,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="mt-10 mb-6">
+                <div className="mt-10 mb-6 py-5">
                   <h3 className="text-xl font-bold mb-4 text-center">Memory Circuit Building</h3>
                   <p className="text-sm leading-7">
                     There are people who can memorize the order of a deck of cards or the names of 100 people with perfect accuracy after seeing them only once. These people are not born this way they learn these skills through specialized practices. These practices strengthen the specific brain circuits and regions that give us these abilities so anyone can achieve this level of recall. Imagine being able to remember all of the information that you hear or read. You would always get high marks on tests without ever needing to study.
@@ -179,12 +179,12 @@ export default function Home() {
                   >
                     Free Consultation
                   </a>
-                  <p className="text-sm mt-2">Discover how we can help you</p>
+                  <p className="text-sm mt-2">Meet and Test Methods</p>
                   <div className="border-top border border-black w-full my-6"></div>
                   <p className="text-gray-700 text-base">$0</p>
                   <p className="text-gray-700 text-base">60 min</p>
                 </div>
-                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
+                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
                   <a href="/calendar/free-consultation" className="btn-main">
                     Book Now
                   </a>
@@ -200,12 +200,12 @@ export default function Home() {
                   >
                     Individual Session
                   </a>
-                  <p className="text-sm mt-2">One-on-one coaching sessions</p>
+                  <p className="text-sm mt-2">One-on-one sessions</p>
                   <div className="border-top border border-black w-full my-6"></div>
                   <p className="text-gray-700 text-base">$0 - $25 - $200</p>
                   <p className="text-gray-700 text-base">60-90 min</p>
                 </div>
-                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
+                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
                   <a 
                     href={"https://calendly.com/abeapple/one-on-one-session"} 
                     className="btn-main">
@@ -223,12 +223,12 @@ export default function Home() {
                   >
                     Group Session
                   </a>
-                  <p className="text-sm mt-2">Small group coaching sessions</p>
+                  <p className="text-sm mt-2">Small group sessions</p>
                   <div className="border-top border border-black w-full my-6"></div>
                   <p className="text-gray-700 text-base">$0 - $25 - 200</p>
                   <p className="text-gray-700 text-base">90 min</p>
                 </div>
-                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
+                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
                   <a href="/calendar/group-session" className="btn-main">
                     Book Now
                   </a>
@@ -249,7 +249,7 @@ export default function Home() {
                   <p className="text-gray-700 text-base">$0</p>
                   <p className="text-gray-700 text-base">30 min</p>
                 </div>
-                <div className="w-full mx-auto pb-8 absolute bottom-0 text-center">
+                <div className="w-full mx-auto pb-4 absolute bottom-0 text-center">
                   <a 
                     href="https://calendly.com/abeapple/30min" 
                     className="btn-main"

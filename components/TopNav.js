@@ -44,10 +44,10 @@ export default function TopNav() {
   const isHomePage = pathname === '/';
 
   const navItems = [
+    { name: 'Appointments / Our Services', id: 'our-services' },
     { name: 'What We Do', id: 'what-we-do' },
     { name: 'Focus Areas', id: 'focus-areas' },
     { name: 'Our Methods', id: 'our-methods' },
-    { name: 'Our Services', id: 'our-services' }
   ];
 
   return (
