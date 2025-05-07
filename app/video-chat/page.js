@@ -11,7 +11,7 @@
 */
 
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import "./videoChat.css"
 
 // Create a client component that uses useSearchParams
@@ -23,6 +23,44 @@ function VideoMeeting() {
     const [userName, setUserName] = useState('Guest');
     const [zoomUrl, setZoomUrl] = useState('');
     const [directZoomUrl, setDirectZoomUrl] = useState('');
+    const handleRef = useRef(null);
+    
+    // Handle drag functionality for mobile scrolling
+    useEffect(() => {
+        const handleElement = handleRef.current;
+        if (!handleElement) return;
+        
+        let startY = 0;
+        let scrolling = false;
+        
+        const handleTouchStart = (e) => {
+            startY = e.touches[0].clientY;
+            scrolling = true;
+        };
+        
+        const handleTouchMove = (e) => {
+            if (!scrolling) return;
+            const currentY = e.touches[0].clientY;
+            const deltaY = startY - currentY;
+            window.scrollBy(0, deltaY);
+            startY = currentY;
+            e.preventDefault();
+        };
+        
+        const handleTouchEnd = () => {
+            scrolling = false;
+        };
+        
+        handleElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+        handleElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+        handleElement.addEventListener('touchend', handleTouchEnd);
+        
+        return () => {
+            handleElement.removeEventListener('touchstart', handleTouchStart);
+            handleElement.removeEventListener('touchmove', handleTouchMove);
+            handleElement.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, []);
     
     useEffect(() => {
         // Only access searchParams in useEffect to avoid SSR issues
@@ -51,7 +89,7 @@ function VideoMeeting() {
             <div style={{width: "100%", padding: "5px"}}>
             {meetingId && (
                 <>
-                    <div style={{height: "calc(100vh - 130px)"}}>
+                    <div className="video-container">
                         <iframe
                             src={zoomUrl}
                             width="100%" 
@@ -59,6 +97,11 @@ function VideoMeeting() {
                             allow="microphone; camera; fullscreen"
                             style={{ border: 'none' }}
                         />
+                        <div className="handle-container" ref={handleRef}>
+                            <div className="handle-line"></div>
+                            <div className="handle-line"></div>
+                            <div className="handle-line"></div>
+                        </div>
                     </div>
                     <div className="audio-troubleshoot-button">
                         <a 

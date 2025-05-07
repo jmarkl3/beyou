@@ -1,3 +1,36 @@
+.video-container {
+  position: relative; /* Required for absolute positioning of children */
+  height: calc(100vh - 130px);
+}
+
+.handle-container {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 80px;
+  background-color: #ffffff;
+  border: 2px solid #cccccc;
+  border-radius: 20px 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.handle-line {
+  width: 24px;
+  height: 3px;
+  background-color: #555;
+  margin: 4px 0;
+  border-radius: 1.5px;
+}
+
 .audio-troubleshoot-button {
   position: relative;
   margin-top: 10px;
