@@ -1,6 +1,47 @@
+/* Main wrapper for the video chat page */
+.video-chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: 64px; /* TopNav height */
+  box-sizing: border-box;
+}
+
+/* Content container */
+.video-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  overflow: hidden;
+}
+
+/* Video container */
 .video-container {
   position: relative; /* Required for absolute positioning of children */
-  height: calc(100vh - 130px);
+  flex: 1;
+  min-height: 300px;
+}
+
+/* Audio button container */
+.audio-troubleshoot-button {
+  height: 30px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mobile-specific adjustments */
+@media screen and (max-width: 768px) {
+  .video-chat-wrapper {
+    height: 100vh;
+  }
+  
+  .video-container {
+    min-height: 250px;
+  }
 }
 
 .handle-container {
@@ -42,14 +83,14 @@
 .btn-zoom-audio {
   background-color: #2D8CFF; /* Zoom blue color */
   color: white;
-  padding: 8px 16px;
+  padding: 5px 12px;
   border-radius: 5px;
   text-decoration: none;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
   font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
 }
 
 .btn-zoom-audio:hover {
-  background-color: #2681F2; /* Slightly darker Zoom blue on hover */
+  background-color: #2681e6; /* Slightly darker blue on hover */
 }
