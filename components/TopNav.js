@@ -25,6 +25,21 @@ export default function TopNav() {
     }
   };
 
+  const scrollToBottomNav = () => {
+    setIsMenuOpen(false);
+    
+    // Find the footer element which contains the BottomNav
+    const footer = document.querySelector('footer');
+    
+    // If footer exists, scroll to it
+    if (footer) {
+      window.scrollTo({
+        top: footer.offsetTop - 80, // Offset for the nav bar
+        behavior: 'smooth'
+      });
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollPos = window.scrollY;
@@ -48,6 +63,7 @@ export default function TopNav() {
     { name: 'What We Do', id: 'what-we-do' },
     { name: 'Focus Areas', id: 'focus-areas' },
     { name: 'Our Methods', id: 'our-methods' },
+    { name: 'Contact', id: 'contact', isContactLink: true },
   ];
 
   return (
@@ -86,10 +102,13 @@ export default function TopNav() {
           {navItems.map((item) => (
             <a
               key={item.id}
-              href={isHomePage ? `#${item.id}` : `/#${item.id}`}
+              href={item.isContactLink ? '#' : (isHomePage ? `#${item.id}` : `/#${item.id}`)}
               onClick={(e) => {
                 e.preventDefault();
-                if (isHomePage) {
+                if (item.isContactLink) {
+                  // For Contact link, always scroll to BottomNav regardless of page
+                  scrollToBottomNav();
+                } else if (isHomePage) {
                   scrollToSection(item.id);
                 } else {
                   window.location.href = `/#${item.id}`;

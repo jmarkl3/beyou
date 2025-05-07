@@ -91,7 +91,7 @@ export default function Home() {
         </div>
 
         {/* Methods Section (combining Our Methods and EMD) */}
-        <div className="w-full bg-gray-50 h-full relative py-5">
+        <div id="our-methods" className="w-full bg-gray-50 h-full relative py-5">
           <div className="max-w-full-content mx-auto h-full px-5">            
             <div className="text-center max-w-4xl mx-auto">
               <h2 className="text-4xl font-bold mb-6">Our Methods</h2>

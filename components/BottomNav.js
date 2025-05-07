@@ -25,7 +25,7 @@ export default function BottomNav() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    {/* Right Column - Contact Information */}
                    <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+            <h3 className="text-3xl font-bold mb-4 text-white">Contact</h3>
             <ul className="space-y-3">
               {contactInfo.map((item, index) => (
                 <li key={index} className="flex">
