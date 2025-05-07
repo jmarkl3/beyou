@@ -1,0 +1,22 @@
+.audio-troubleshoot-button {
+  position: relative;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+}
+
+.btn-zoom-audio {
+  background-color: #2D8CFF; /* Zoom blue color */
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+
+.btn-zoom-audio:hover {
+  background-color: #2681F2; /* Slightly darker Zoom blue on hover */
+}

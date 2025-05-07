@@ -19,37 +19,58 @@ function VideoMeeting() {
     const searchParams = useSearchParams();
     const [meetingId, setMeetingId] = useState('');
     const [passcode, setPasscode] = useState('');
+    const [secondaryPassword, setSecondaryPassword] = useState('');
     const [userName, setUserName] = useState('Guest');
     const [zoomUrl, setZoomUrl] = useState('');
+    const [directZoomUrl, setDirectZoomUrl] = useState('');
     
     useEffect(() => {
         // Only access searchParams in useEffect to avoid SSR issues
         const meetingIdParam = searchParams.get('meetingId');
         const passcodeParam = searchParams.get('passcode');
+        const secondaryPasswordParam = searchParams.get('secondaryPassword');
         const userNameParam = searchParams.get('userName') || 'Guest';
         
         setMeetingId(meetingIdParam || '');
         setPasscode(passcodeParam || '');
+        setSecondaryPassword(secondaryPasswordParam || '');
         setUserName(userNameParam);
         
         if (meetingIdParam) {
             // ex: http://localhost:3000/video-chat?meetingId=89030782658
             // http://localhost:3000/video-chat?meetingId=89030782658&passcode=h4LRMK
             setZoomUrl(`https://zoom.us/wc/${meetingIdParam}/join?pwd=${passcodeParam || ''}&name=${userNameParam}`);
+            
+            // Set direct Zoom URL with secondary password for the 'Audio not working?' button
+            setDirectZoomUrl(`https://app.zoom.us/wc/${meetingIdParam}/join?fromPWA=1&pwd=${secondaryPasswordParam || passcodeParam || ''}`);
         }
     }, [searchParams]);
     
     return (
         <div className="pt-16 pb-4">
-            <div style={{height: "calc(100vh - 100px)", width: "100%", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px"}}>
+            <div style={{width: "100%", paddingLeft: "5px", paddingRight: "5px", paddingTop: "5px"}}>
             {meetingId && (
-                <iframe
-                    src={zoomUrl}
-                    width="100%" 
-                    height="100%"
-                    allow="microphone; camera; fullscreen"
-                    style={{ border: 'none' }}
-                />
+                <>
+                    <div style={{height: "calc(100vh - 100px)", minHeight: "600px"}}>
+                        <iframe
+                            src={zoomUrl}
+                            width="100%" 
+                            height="100%"
+                            allow="microphone; camera; fullscreen"
+                            style={{ border: 'none', minHeight: '600px' }}
+                        />
+                    </div>
+                    <div className="audio-troubleshoot-button">
+                        <a 
+                            href={directZoomUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="btn-zoom-audio"
+                        >
+                            Audio not working? Open in Zoom
+                        </a>
+                    </div>
+                </>
             )}
             {!meetingId && (
                 <div className="flex items-center justify-center h-full">

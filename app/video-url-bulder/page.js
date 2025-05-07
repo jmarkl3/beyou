@@ -8,6 +8,7 @@ function UrlBuilderContent() {
   const [formData, setFormData] = useState({
     meetingId: '',
     passcode: '',
+    secondaryPassword: '',
     userName: '',
     notes: ''
   });
@@ -88,10 +89,19 @@ function UrlBuilderContent() {
       return;
     }
     
-    let url = `${baseUrl}?meetingId=${formData.meetingId}`;
+    // Remove spaces from inputs
+    const meetingIdNoSpaces = formData.meetingId.replace(/\s+/g, '');
+    const passcodeNoSpaces = formData.passcode ? formData.passcode.replace(/\s+/g, '') : '';
+    const secondaryPasswordNoSpaces = formData.secondaryPassword ? formData.secondaryPassword.replace(/\s+/g, '') : '';
     
-    if (formData.passcode) {
-      url += `&passcode=${formData.passcode}`;
+    let url = `${baseUrl}?meetingId=${meetingIdNoSpaces}`;
+    
+    if (passcodeNoSpaces) {
+      url += `&passcode=${passcodeNoSpaces}`;
+    }
+    
+    if (secondaryPasswordNoSpaces) {
+      url += `&secondaryPassword=${secondaryPasswordNoSpaces}`;
     }
     
     if (formData.userName) {
@@ -153,25 +163,7 @@ function UrlBuilderContent() {
         Create a shareable link for your video meeting. Fill in the details below and generate a URL that participants can use to join.
       </p>
 
-      <div className="zoom-url-section">
-        <h2>Extract from Zoom URL</h2>
-        <p>Paste a Zoom meeting URL to automatically extract the meeting ID and passcode.</p>
-        <div className="zoom-url-input">
-          <input
-            type="text"
-            placeholder="Paste Zoom URL (e.g., https://us05web.zoom.us/j/12345678901?pwd=abcdef)"
-            value={zoomUrl}
-            onChange={handleZoomUrlInput}
-          />
-          <button 
-            type="button" 
-            className="extract-button"
-            onClick={extractZoomInfo}
-          >
-            Extract Info
-          </button>
-        </div>
-      </div>
+      {/* Zoom URL extraction section removed as requested */}
 
       <div className="builder-content">
         <div className="form-section">
@@ -188,6 +180,7 @@ function UrlBuilderContent() {
                   placeholder="Enter Meeting ID"
                   required
                 />
+                {/* Random generation button commented out
                 <button 
                   type="button" 
                   className="generate-button"
@@ -196,6 +189,7 @@ function UrlBuilderContent() {
                 >
                   Random
                 </button>
+                */}
               </div>
             </div>
             
@@ -210,6 +204,7 @@ function UrlBuilderContent() {
                   onChange={handleInputChange}
                   placeholder="Enter Passcode (optional)"
                 />
+                {/* Random generation button commented out
                 <button 
                   type="button" 
                   className="generate-button"
@@ -218,9 +213,22 @@ function UrlBuilderContent() {
                 >
                   Random
                 </button>
+                */}
               </div>
             </div>
             
+            <div className="form-group">
+              <label htmlFor="secondaryPassword">Secondary Password</label>
+              <input
+                type="text"
+                id="secondaryPassword"
+                name="secondaryPassword"
+                value={formData.secondaryPassword}
+                onChange={handleInputChange}
+                placeholder="Enter Secondary Password"
+              />
+            </div>
+
             <div className="form-group">
               <label htmlFor="userName">Default User Name</label>
               <input
