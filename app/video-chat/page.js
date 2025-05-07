@@ -13,7 +13,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef, Suspense } from 'react';
 import "./videoChat.css"
-import isMobile from 'ismobile';
+import {isMobile} from 'react-device-detect';
 
 // Create a client component that uses useSearchParams
 function VideoMeeting() {
@@ -86,7 +86,7 @@ function VideoMeeting() {
     }, [searchParams]);
     
     // Apply conditional styling based on device type
-    const wrapperStyle = isMobile ? { height: 'calc(100vh - 60px)' } : {};
+    const wrapperStyle = isMobile ? { height: 'calc(100vh - 90px)' } : {};
     
     return (
         <div className="video-chat-wrapper" style={wrapperStyle}>
