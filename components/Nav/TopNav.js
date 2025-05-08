@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useDispatch } from 'react-redux';
-import { openAuthMenu } from '../../redux/MainSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { openAuthMenu, selectUserId } from '../../redux/MainSlice';
+import { useRouter } from 'next/navigation';
 
 export default function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +12,8 @@ export default function TopNav() {
   const [visible, setVisible] = useState(true);
   const pathname = usePathname();
   const dispatch = useDispatch();
+  const router = useRouter();
+  const userId = useSelector(selectUserId);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -63,7 +66,7 @@ export default function TopNav() {
 
   const navItems = [
     { name: 'Appointments / Our Services', id: 'our-services' },
-    { name: 'Auth Menu', id: 'auth-menu' },
+    { name: 'Account', id: 'account' },
     { name: 'What We Do', id: 'what-we-do' },
     { name: 'Focus Areas', id: 'focus-areas' },
     { name: 'Our Methods', id: 'our-methods' },
@@ -112,9 +115,13 @@ export default function TopNav() {
                 if (item.isContactLink) {
                   // For Contact link, always scroll to BottomNav regardless of page
                   scrollToBottomNav();
-                } else if (item.id === 'auth-menu') {
-                  // For Auth Menu option, dispatch the openAuthMenu action
-                  dispatch(openAuthMenu());
+                } else if (item.id === 'account') {
+                  // If user is logged in, go to account page, otherwise open auth menu
+                  if (userId) {
+                    router.push('/account');
+                  } else {
+                    dispatch(openAuthMenu());
+                  }
                   setIsMenuOpen(false);
                 } else if (isHomePage) {
                   scrollToSection(item.id);

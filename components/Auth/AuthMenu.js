@@ -1,11 +1,14 @@
 'use client';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { closeAuthMenu } from '../../redux/MainSlice';
+import { closeAuthMenu, setUserId } from '../../redux/MainSlice';
+import { useRouter } from 'next/navigation';
 
 export default function AuthMenu() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState('');
 
   const handleClose = () => {
     dispatch(closeAuthMenu());
@@ -16,12 +19,39 @@ export default function AuthMenu() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
-    // Authentication logic will be implemented later
+    setError('');
+    
     if (isLogin) {
       console.log('Login attempt with:', { email, password });
+      // Simple validation - in a real app, this would be a server call
+      if (email && password) {
+        console.log("hello")
+        // Simulate successful login
+        dispatch(setUserId('test'));
+        dispatch(closeAuthMenu());
+        router.push('/account');
+      } else {
+        setError('Please enter both email and password');
+      }
     } else {
       const passwordConfirm = document.getElementById('passwordConfirm').value;
       console.log('Sign up attempt with:', { email, password, passwordConfirm });
+      
+      // Simple validation - in a real app, this would be a server call
+      if (!email || !password) {
+        setError('Please fill in all fields');
+        return;
+      }
+      
+      if (password !== passwordConfirm) {
+        setError('Passwords do not match');
+        return;
+      }
+      
+      // Simulate successful signup
+      dispatch(setUserId('test'));
+      dispatch(closeAuthMenu());
+      router.push('/account');
     }
   };
 
@@ -72,6 +102,12 @@ export default function AuthMenu() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Password retype"
               />
+            </div>
+          )}
+          
+          {error && (
+            <div className="mb-4 text-center">
+              <p className="text-red-500">{error}</p>
             </div>
           )}
           
