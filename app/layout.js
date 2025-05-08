@@ -1,7 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import TopNav from '../components/TopNav';
-import BottomNav from '../components/BottomNav';
+import TopNav from '../components/Nav/TopNav';
+import BottomNav from '../components/Nav/BottomNav';
+import ReduxProvider from '../redux/Provider';
+import AuthManager from '../components/Auth/AuthManager';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,9 +27,12 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ backgroundImage: "url('/site-background.jpeg')", backgroundSize: "cover", backgroundAttachment: "fixed", backgroundPosition: "center" }}
       >
-        <TopNav />
-        {children}
-        <BottomNav />
+        <ReduxProvider>
+          <TopNav />
+          <AuthManager />
+          {children}
+          <BottomNav />
+        </ReduxProvider>
       </body>
     </html>
   );
