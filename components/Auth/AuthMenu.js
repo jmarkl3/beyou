@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { closeAuthMenu, setUserId } from '../../redux/MainSlice';
+import { closeAuthMenu, setUserId, setAccountData } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 
 export default function AuthMenu() {
@@ -14,8 +14,15 @@ export default function AuthMenu() {
     dispatch(closeAuthMenu());
   };
 
+  // Sample user data to be set when user logs in
+  const sampleAccountData = {
+    name: 'John Doe',
+    preferredName: 'Johnny',
+    email: 'user@example.com',
+    phone: '(555) 123-4567'
+  };
+
   const handleAuth = () => {
-    // Get input values using getElementById
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
@@ -28,6 +35,7 @@ export default function AuthMenu() {
         console.log("hello")
         // Simulate successful login
         dispatch(setUserId('test'));
+        dispatch(setAccountData(sampleAccountData));
         dispatch(closeAuthMenu());
         router.push('/account');
       } else {
