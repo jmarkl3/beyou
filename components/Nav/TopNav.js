@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { openAuthMenu, selectUserId } from '../../redux/MainSlice';
+import { openAuthMenu } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 
 export default function TopNav() {
@@ -13,7 +13,7 @@ export default function TopNav() {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const router = useRouter();
-  const userId = useSelector(selectUserId);
+  const auth_id = useSelector((state) => state.main.auth_id);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -67,7 +67,7 @@ export default function TopNav() {
   // Account action function
   const accountAction = () => {
     // If user is logged in, go to account page, otherwise open auth menu
-    if (userId) {
+    if (auth_id) {
       router.push('/account');
     } else {
       dispatch(openAuthMenu());
@@ -96,12 +96,12 @@ export default function TopNav() {
   // Define navigation items with name and action function
   const navItems = [
     { 
-      name: 'Appointments / Our Services',
-      action: createScrollToFunction('our-services')
-    },
-    { 
       name: 'Account',
       action: accountAction
+    },
+    { 
+      name: 'Appointments / Our Services',
+      action: createScrollToFunction('our-services')
     },
     { 
       name: 'What We Do',

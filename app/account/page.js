@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUserId, setUserId } from '../../redux/MainSlice';
+import { setAuthId, openAuthMenu } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 
 // Account input fields configuration
@@ -21,21 +21,17 @@ const sampleUserData = {
 };
 
 export default function AccountPage() {
-  const userId = useSelector(selectUserId);
+  const auth_id = useSelector((state) => state.main.auth_id);
   const dispatch = useDispatch();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(sampleUserData);
 
-  // Redirect to home if not logged in
-  useEffect(() => {
-    if (!userId) {
-      router.push('/');
-    }
-  }, [userId, router]);
+  // No longer redirecting automatically if not logged in
+  // Instead, we'll show a message box with options
 
   const handleLogout = () => {
-    dispatch(setUserId(null));
+    dispatch(setAuthId(null));
     router.push('/');
   };
 
@@ -54,8 +50,39 @@ export default function AccountPage() {
     setIsEditing(false);
   };
 
-  if (!userId) {
-    return null; // Don't render anything while redirecting
+  const handleOpenAuthMenu = () => {
+    dispatch(openAuthMenu());
+  };
+
+  const handleGoHome = () => {
+    router.push('/');
+  };
+
+  if (!auth_id) {
+    return (
+      <div className="container mx-auto px-4 py-20 max-w-4xl">
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Not Signed In</h2>
+          <p className="text-gray-600 mb-6">You need to be signed in to access your account.</p>
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button 
+              onClick={handleOpenAuthMenu}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-md transition-colors"
+            >
+              Sign In
+            </button>
+            
+            <button 
+              onClick={handleGoHome}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-md transition-colors"
+            >
+              Go to Home Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -76,7 +103,7 @@ export default function AccountPage() {
         
         <div className="mb-4">
           <p className="text-gray-600">User ID:</p>
-          <p className="font-medium">{userId}</p>
+          <p className="font-medium">{auth_id}</p>
         </div>
         
         {accountInputFields.map((field) => (

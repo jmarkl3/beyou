@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { closeAuthMenu, setUserId } from '../../redux/MainSlice';
+import { closeAuthMenu, setAuthId } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../../app/utils/supabase/client';
 
 export default function AuthMenu() {
   const dispatch = useDispatch();
@@ -14,7 +15,84 @@ export default function AuthMenu() {
     dispatch(closeAuthMenu());
   };
 
-  const handleAuth = () => {
+  // Sign in with Supabase
+  const signInWithSupabase = async (email, password) => {
+    console.log('Step 1: Starting sign in process with Supabase');
+    try {
+      console.log('Step 2: Validating input');
+      if (!email || !password) {
+        throw new Error('Please enter both email and password');
+      }
+      
+      console.log('Step 3: Attempting to sign in with email and password');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('Step 4: Sign in error:', error.message);
+        throw error;
+      }
+      
+      console.log('Step 4: Sign in successful');
+      console.log('Step 5: User data:', data.user);
+      
+      // Close auth menu and redirect to account page
+      console.log('Step 6: Closing auth menu and redirecting to account page');
+      dispatch(closeAuthMenu());
+      router.push('/account');
+      
+      return data;
+    } catch (error) {
+      console.error('Sign in error:', error.message);
+      setError(error.message);
+      return null;
+    }
+  };
+  
+  // Sign up with Supabase
+  const signUpWithSupabase = async (email, password, passwordConfirm) => {
+    console.log('Step 1: Starting sign up process with Supabase');
+    try {
+      console.log('Step 2: Validating input');
+      if (!email || !password) {
+        throw new Error('Please fill in all fields');
+      }
+      
+      if (password !== passwordConfirm) {
+        throw new Error('Passwords do not match');
+      }
+      
+      console.log('Step 3: Attempting to sign up with email and password');
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('Step 4: Sign up error:', error.message);
+        throw error;
+      }
+      
+      console.log('Step 4: Sign up successful');
+      console.log('Step 5: User data:', data.user);
+      console.log('Step 6: Email confirmation status:', data.session ? 'No confirmation needed' : 'Confirmation email sent');
+      
+      // Close auth menu and redirect to account page
+      console.log('Step 7: Closing auth menu and redirecting to account page');
+      dispatch(closeAuthMenu());
+      router.push('/account');
+      
+      return data;
+    } catch (error) {
+      console.error('Sign up error:', error.message);
+      setError(error.message);
+      return null;
+    }
+  };
+
+  const handleAuth = async () => {
     // Get input values using getElementById
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -22,36 +100,12 @@ export default function AuthMenu() {
     setError('');
     
     if (isLogin) {
-      console.log('Login attempt with:', { email, password });
-      // Simple validation - in a real app, this would be a server call
-      if (email && password) {
-        console.log("hello")
-        // Simulate successful login
-        dispatch(setUserId('test'));
-        dispatch(closeAuthMenu());
-        router.push('/account');
-      } else {
-        setError('Please enter both email and password');
-      }
+      console.log('Login attempt initiated with email:', email);
+      await signInWithSupabase(email, password);
     } else {
       const passwordConfirm = document.getElementById('passwordConfirm').value;
-      console.log('Sign up attempt with:', { email, password, passwordConfirm });
-      
-      // Simple validation - in a real app, this would be a server call
-      if (!email || !password) {
-        setError('Please fill in all fields');
-        return;
-      }
-      
-      if (password !== passwordConfirm) {
-        setError('Passwords do not match');
-        return;
-      }
-      
-      // Simulate successful signup
-      dispatch(setUserId('test'));
-      dispatch(closeAuthMenu());
-      router.push('/account');
+      console.log('Sign up attempt initiated with email:', email);
+      await signUpWithSupabase(email, password, passwordConfirm);
     }
   };
 
