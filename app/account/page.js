@@ -12,20 +12,17 @@ const accountInputFields = [
   { key: 'phone', label: 'Phone' }
 ];
 
-// Sample user data
-const sampleUserData = {
-  name: 'John Doe',
-  preferred_name: 'Johnny',
-  email: 'john.doe@example.com',
-  phone: '(555) 123-4567'
-};
-
 export default function AccountPage() {
   const auth_id = useSelector((state) => state.main.auth_id);
+  const userData = useSelector((state) => state.main.userData || {});
   const dispatch = useDispatch();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState(sampleUserData);
+  
+  // Log user data from Redux
+  const logUserData = () => {
+    console.log('User data from Redux:', userData);
+  };
 
   // No longer redirecting automatically if not logged in
   // Instead, we'll show a message box with options
@@ -37,11 +34,10 @@ export default function AccountPage() {
 
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({
-      ...userData,
-      [name]: value
-    });
+    // This would need to be updated to modify the Redux store directly
+    // or to call a Supabase update function
+    console.log('Input change:', e.target.name, e.target.value);
+    // For now, just log the change but don't update anything
   };
 
   const handleSave = () => {
@@ -106,6 +102,8 @@ export default function AccountPage() {
           <p className="font-medium">{auth_id}</p>
         </div>
         
+
+        
         {accountInputFields.map((field) => (
           <div className="mb-4" key={field.key}>
             <p className="text-gray-600">{field.label}:</p>
@@ -127,12 +125,21 @@ export default function AccountPage() {
       
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Account Settings</h2>
-        <button 
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
-        >
-          Log Out
-        </button>
+        <div className="flex flex-wrap gap-4">
+          <button 
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
+          >
+            Log Out
+          </button>
+          
+          <button 
+            onClick={logUserData}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors"
+          >
+            Log User Data
+          </button>
+        </div>
       </div>
     </div>
   );

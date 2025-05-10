@@ -75,7 +75,7 @@ export default function AuthMenu() {
       // Close auth menu and redirect to account page
       console.log('Step 6: Closing auth menu and redirecting to account page');
       dispatch(closeAuthMenu());
-      router.push('/account');
+      // router.push('/account');
       
       return data;
     } catch (error) {
@@ -110,7 +110,7 @@ export default function AuthMenu() {
       }
       
       console.log('Step 5: Sign in successful');
-      console.log('Step 6: User data:', data.user);
+      console.log('Step 6: Sign In data:', data.user);
       
       // Close auth menu and redirect to account page
       console.log('Step 7: Closing auth menu and redirecting to account page');
@@ -208,7 +208,7 @@ export default function AuthMenu() {
       }
       
       console.log('Step 5: Sign up successful');
-      console.log('Step 6: User data:', data.user);
+      console.log('Step 6: Sign Up data:', data.user);
       console.log('Step 7: Phone confirmation status:', data.session ? 'No confirmation needed' : 'Confirmation SMS sent');
       
       // Close auth menu and redirect to account page
@@ -290,6 +290,7 @@ export default function AuthMenu() {
               id="password"
               className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Password"
+              defaultValue="password"
             />
           </div>
           
