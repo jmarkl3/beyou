@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUserId, selectAccountData, setAccountData } from '../../redux/MainSlice';
+import { selectUserId, selectAccountData, setAccountData, openAuthMenu } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 import supabase from '../supabase/client';
 import SupabaseInput from '../../components/SupabaseInput';
@@ -50,7 +50,7 @@ export default function AccountPage() {
           <p className="text-gray-600 mb-6">You need to be signed in to view your account information.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              onClick={handleOpenAuthMenu}
+              onClick={() => dispatch(openAuthMenu())}
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-md transition-colors"
             >
               Sign In

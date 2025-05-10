@@ -101,6 +101,7 @@ export default function SupabaseInput({
           id: rowId
         });
       }
+      console.log(supabase)
 
       // Directly update the record without checking if it exists
       const { data, error } = await supabase
