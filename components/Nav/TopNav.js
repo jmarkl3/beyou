@@ -19,18 +19,36 @@ export default function TopNav() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const scrollToSection = (sectionId) => {
-    setIsMenuOpen(false);
-    
-    const section = document.getElementById(sectionId);
-    if (section) {
-      window.scrollTo({
-        top: section.offsetTop - 80, // Offset for the nav bar
-        behavior: 'smooth'
-      });
-    }
+  // Create a function to scroll to a section
+  const createScrollToFunction = (sectionId) => {
+    return () => {
+      setIsMenuOpen(false);
+      
+      if (isHomePage) {
+        // If on home page, scroll to the section
+        const section = document.getElementById(sectionId);
+        if (section) {
+          window.scrollTo({
+            top: section.offsetTop - 80, // Offset for the nav bar
+            behavior: 'smooth'
+          });
+        }
+      } else {
+        // If not on home page, navigate to home page with anchor
+        window.location.href = `/#${sectionId}`;
+      }
+    };
   };
 
+  // Create a function to navigate to a page
+  const createPageNavigationFunction = (route) => {
+    return () => {
+      setIsMenuOpen(false);
+      router.push(route);
+    };
+  };
+  
+  // Function to scroll to bottom nav (contact)
   const scrollToBottomNav = () => {
     setIsMenuOpen(false);
     
@@ -44,6 +62,17 @@ export default function TopNav() {
         behavior: 'smooth'
       });
     }
+  };
+  
+  // Account action function
+  const accountAction = () => {
+    // If user is logged in, go to account page, otherwise open auth menu
+    if (userId) {
+      router.push('/account');
+    } else {
+      dispatch(openAuthMenu());
+    }
+    setIsMenuOpen(false);
   };
 
   useEffect(() => {
@@ -64,13 +93,36 @@ export default function TopNav() {
   // If we're not on the home page, we need to handle navigation differently
   const isHomePage = pathname === '/';
 
+  // Define navigation items with name and action function
   const navItems = [
-    { name: 'Appointments / Our Services', id: 'our-services' },
-    { name: 'Account', id: 'account' },
-    { name: 'What We Do', id: 'what-we-do' },
-    { name: 'Focus Areas', id: 'focus-areas' },
-    { name: 'Our Methods', id: 'our-methods' },
-    { name: 'Contact', id: 'contact', isContactLink: true },
+    { 
+      name: 'Appointments / Our Services',
+      action: createScrollToFunction('our-services')
+    },
+    { 
+      name: 'Account',
+      action: accountAction
+    },
+    { 
+      name: 'What We Do',
+      action: createScrollToFunction('what-we-do')
+    },
+    { 
+      name: 'Focus Areas',
+      action: createScrollToFunction('focus-areas')
+    },
+    { 
+      name: 'Our Methods',
+      action: createScrollToFunction('our-methods')
+    },
+    { 
+      name: 'Contact',
+      action: scrollToBottomNav
+    },
+    { 
+      name: 'Sanity Check',
+      action: createPageNavigationFunction('/sanity-check')
+    }
   ];
 
   return (
@@ -106,28 +158,13 @@ export default function TopNav() {
       {/* Mobile menu, show/hide based on menu state */}
       <div className={`${isMenuOpen ? 'block' : 'hidden'} fixed top-16 left-0 right-0 bg-white shadow-md z-50`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {navItems.map((item) => (
+          {navItems.map((item, index) => (
             <a
-              key={item.id}
-              href={item.isContactLink ? '#' : (isHomePage ? `#${item.id}` : `/#${item.id}`)}
+              key={index}
+              href="#"
               onClick={(e) => {
                 e.preventDefault();
-                if (item.isContactLink) {
-                  // For Contact link, always scroll to BottomNav regardless of page
-                  scrollToBottomNav();
-                } else if (item.id === 'account') {
-                  // If user is logged in, go to account page, otherwise open auth menu
-                  if (userId) {
-                    router.push('/account');
-                  } else {
-                    dispatch(openAuthMenu());
-                  }
-                  setIsMenuOpen(false);
-                } else if (isHomePage) {
-                  scrollToSection(item.id);
-                } else {
-                  window.location.href = `/#${item.id}`;
-                }
+                item.action();
               }}
               className="block px-3 py-2 rounded-md text-base font-medium text-black hover:bg-gray-100"
             >
