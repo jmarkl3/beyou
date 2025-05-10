@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { closeAuthMenu, setUserId, setAccountData } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../app/firebase/firebase-config';
 
 export default function AuthMenu() {
   const dispatch = useDispatch();
@@ -22,30 +24,35 @@ export default function AuthMenu() {
     phone: '(555) 123-4567'
   };
 
-  const handleAuth = () => {
+  const handleAuth = async () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
     setError('');
     
     if (isLogin) {
-      console.log('Login attempt with:', { email, password });
-      // Simple validation - in a real app, this would be a server call
-      if (email && password) {
-        console.log("hello")
-        // Simulate successful login
-        dispatch(setUserId('test'));
+      if (!email || !password) {
+        setError('Please enter both email and password');
+        return;
+      }
+
+      try {
+        // Sign in with Firebase
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // Set account data (still using sample data for now)
         dispatch(setAccountData(sampleAccountData));
+        
+        // Close auth menu and redirect to account page
         dispatch(closeAuthMenu());
         router.push('/account');
-      } else {
-        setError('Please enter both email and password');
+      } catch (error) {
+        console.error('Login error:', error);
+        setError(error.message || 'Failed to sign in');
       }
     } else {
       const passwordConfirm = document.getElementById('passwordConfirm').value;
-      console.log('Sign up attempt with:', { email, password, passwordConfirm });
       
-      // Simple validation - in a real app, this would be a server call
       if (!email || !password) {
         setError('Please fill in all fields');
         return;
@@ -55,11 +62,18 @@ export default function AuthMenu() {
         setError('Passwords do not match');
         return;
       }
-      
-      // Simulate successful signup
-      dispatch(setUserId('test'));
-      dispatch(closeAuthMenu());
-      router.push('/account');
+
+      try {
+        // Sign up with Firebase
+        await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Close auth menu and redirect to account page
+        dispatch(closeAuthMenu());
+        router.push('/account');
+      } catch (error) {
+        console.error('Signup error:', error);
+        setError(error.message || 'Failed to sign up');
+      }
     }
   };
 

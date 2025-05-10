@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectUserId, setUserId, selectAccountData, updateAccountField } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../app/firebase/firebase-config';
 
 export default function AccountPage() {
   const userId = useSelector(selectUserId);
@@ -26,9 +28,15 @@ export default function AccountPage() {
     }
   }, [userId, router]);
 
-  const handleLogout = () => {
-    dispatch(setUserId(null));
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      // Sign out from Firebase
+      await signOut(auth);
+      // The AuthManager will detect the sign-out and update Redux
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   if (!userId) {
