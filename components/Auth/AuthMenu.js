@@ -1,15 +1,32 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { closeAuthMenu, setAuthId } from '../../redux/MainSlice';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../app/utils/supabase/client';
 
 export default function AuthMenu() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
+  const [emailFromUrl, setEmailFromUrl] = useState('');
+  const [passwordFromUrl, setPasswordFromUrl] = useState('');
+  
+  // Check for URL parameters on component mount
+  useEffect(() => {
+    const email = searchParams.get('email');
+    const password = searchParams.get('password');
+    
+    if (email) {
+      setEmailFromUrl(email);
+    }
+    
+    if (password) {
+      setPasswordFromUrl(password);
+    }
+  }, [searchParams]);
 
   const handleClose = () => {
     dispatch(closeAuthMenu());
@@ -75,7 +92,7 @@ export default function AuthMenu() {
       // Close auth menu and redirect to account page
       console.log('Step 6: Closing auth menu and redirecting to account page');
       dispatch(closeAuthMenu());
-      // router.push('/account');
+      router.push('/account');
       
       return data;
     } catch (error) {
@@ -281,6 +298,7 @@ export default function AuthMenu() {
               id="identifier"
               className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Email or Phone (ex: 123-456-7890)"
+              defaultValue={emailFromUrl}
             />
           </div>
           
@@ -290,7 +308,7 @@ export default function AuthMenu() {
               id="password"
               className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Password"
-              defaultValue="password"
+              defaultValue={passwordFromUrl}
             />
           </div>
           

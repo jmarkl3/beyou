@@ -13,8 +13,8 @@ const accountInputFields = [
   { key: 'preferred_name', label: 'Preferred Name', type: 'input' },
   { key: 'email', label: 'Email', type: 'input' },
   { key: 'phone', label: 'Phone', type: 'input' },
-  { key: 'type', label: 'Account Type', type: 'input', readonly: true },
-  { key: 'note', label: 'Note', type: 'textarea', rows: 4 }
+  { key: 'type', label: 'Account Type', type: 'input', readonly: true, adminOnly: true },
+  { key: 'note', label: 'Note', type: 'textarea', rows: 4, adminOnly: true }
 ];
 
 export default function AccountPage() {
@@ -197,42 +197,42 @@ export default function AccountPage() {
           </div>
         </div>
         
-        <div className="mb-4">
-          <p className="text-gray-600">User ID:</p>
-          <p className="font-medium">{auth_id}</p>
-        </div>
-        
-
-        
-        {accountInputFields.map((field) => (
-          <div className="mb-4" key={field.key}>
-            <p className="text-gray-600">{field.label}:</p>
-            {isEditing ? (
-              <InputSupabase2
-                table="users"
-                attribute={field.key}
-                identifier={auth_id}
-                identifierName="auth_id"
-                initialValue={userData[field.key] || ''}
-                placeholder={`Enter your ${field.label.toLowerCase()}`}
-                updateCallback={handleUpdateCallback}
-                onChange={handleInputChange}
-                className="border-gray-300"
-                isTextarea={field.type === 'textarea'}
-                rows={field.rows || 3}
-                readOnly={field.readonly}
-              />
-            ) : (
-              field.type === 'textarea' ? (
-                <div className="whitespace-pre-wrap font-medium border p-2 rounded-md bg-gray-50">
-                  {userData[field.key] || 'No notes added yet.'}
-                </div>
+        {accountInputFields.map((field) => {
+          // Skip fields marked as adminOnly if user is not an admin or staff
+          if (field.adminOnly && userData.type !== 'admin' && userData.type !== 'staff') {
+            return null;
+          }
+          
+          return (
+            <div className="mb-4" key={field.key}>
+              <p className="text-gray-600">{field.label}:</p>
+              {isEditing ? (
+                <InputSupabase2
+                  table="users"
+                  attribute={field.key}
+                  identifier={auth_id}
+                  identifierName="auth_id"
+                  initialValue={userData[field.key] || ''}
+                  placeholder={`Enter your ${field.label.toLowerCase()}`}
+                  updateCallback={handleUpdateCallback}
+                  onChange={handleInputChange}
+                  className="border-gray-300"
+                  isTextarea={field.type === 'textarea'}
+                  rows={field.rows || 3}
+                  readOnly={field.readonly}
+                />
               ) : (
-                <p className="font-medium">{userData[field.key] || ''}</p>
-              )
-            )}
-          </div>
-        ))}
+                field.type === 'textarea' ? (
+                  <div className="whitespace-pre-wrap font-medium border p-2 rounded-md bg-gray-50">
+                    {userData[field.key] || 'No notes added yet.'}
+                  </div>
+                ) : (
+                  <p className="font-medium">{userData[field.key] || ''}</p>
+                )
+              )}
+            </div>
+          );
+        })}
         
       </div>
       
@@ -245,13 +245,14 @@ export default function AccountPage() {
           >
             Log Out
           </button>
-          
-          <button 
+
+          {/* For development only */}
+          {/* <button 
             onClick={logUserData}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors"
           >
             Log User Data
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

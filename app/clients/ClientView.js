@@ -7,6 +7,7 @@ import ClientInformation from './components/ClientInformation';
 import ClientSessions from './components/ClientSessions';
 import ClientJournals from './components/ClientJournals';
 import StaffAssignment from './components/StaffAssignment';
+import ClientActions from './components/ClientActions';
 
 const ClientView = () => {
   const dispatch = useDispatch();
@@ -85,14 +86,18 @@ const ClientView = () => {
           )}
           
           <div className="space-y-6">
-            {/* Client Information Section */}
-            <ClientInformation />
-            
+
             {/* Client Sessions Section */}
             <ClientSessions />
             
             {/* Client Journals Section */}
             <ClientJournals />
+
+            {/* Client Information Section */}
+            <ClientInformation />
+            
+            {/* Client Actions Section */}
+            <ClientActions />
             
             {/* Staff Assignment Section */}
             <StaffAssignment />
