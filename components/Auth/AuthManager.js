@@ -8,7 +8,7 @@ import supabase from '../../app/supabase/client';
 export default function AuthManager() {
   const showAuthMenu = useSelector(selectShowAuthMenu);
   const dispatch = useDispatch();
-
+  
   useEffect(() => {
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {

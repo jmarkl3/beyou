@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import supabase from '../app/supabase/client';
 import { useDispatch } from 'react-redux';
 
@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
  * @param {string} props.fieldName - The name of the field in the table to update
  * @param {string} props.rowId - The ID value to identify the row (e.g., the auth_id value)
  * @param {string} props.rowIdField - The name of the ID column in the table (default: 'id', but could be 'auth_id', 'user_id', etc.)
- * @param {string} props.value - The current value of the input
+ * @param {string} props.value - The current value of the input (used as defaultValue)
  * @param {function} props.onUpdate - Callback function when update is successful
  * @param {string} props.type - Input type (text, email, tel, etc.)
  * @param {string} props.className - Additional CSS classes
@@ -31,18 +31,13 @@ export default function SupabaseInput({
   debug = false,
   ...inputProps
 }) {
-  const [inputValue, setInputValue] = useState(value);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateStatus, setUpdateStatus] = useState(null); // null, 'success', or 'error'
   const [error, setError] = useState('');
   const [lastSaveTime, setLastSaveTime] = useState('');
   const timeoutRef = useRef(null);
+  const inputRef = useRef(null);
   const dispatch = useDispatch();
-
-  // Update local state when prop value changes
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
 
   // Validate table and field names to prevent SQL injection
   const isValidIdentifier = (name) => {
@@ -97,38 +92,17 @@ export default function SupabaseInput({
       updateData[fieldName] = newValue;
 
       // Always log the update parameters for debugging
-      console.log('Updating Supabase data:', {
-        table: tableName,
-        field: fieldName,
-        value: newValue,
-        idField: rowIdField,
-        id: rowId
-      });
-
-      // First check if the record exists
-      const { data: existingData, error: checkError } = await supabase
-        .from(tableName)
-        .select('*')
-        .eq(rowIdField, rowId)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error(`Error checking if record exists:`, checkError);
-        setError(`Error checking record: ${checkError.message}`);
-        setUpdateStatus('error');
-        setIsUpdating(false);
-        return;
+      if (debug) {
+        console.log('Updating Supabase data:', {
+          table: tableName,
+          field: fieldName,
+          value: newValue,
+          idField: rowIdField,
+          id: rowId
+        });
       }
 
-      if (!existingData) {
-        console.error(`Record not found with ${rowIdField} = ${rowId}`);
-        setError(`Record not found with ${rowIdField} = ${rowId}`);
-        setUpdateStatus('error');
-        setIsUpdating(false);
-        return;
-      }
-
-      // Record exists, proceed with update
+      // Directly update the record without checking if it exists
       const { data, error } = await supabase
         .from(tableName)
         .update(updateData)
@@ -166,9 +140,6 @@ export default function SupabaseInput({
   };
 
   const handleChange = (e) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -176,10 +147,9 @@ export default function SupabaseInput({
 
     // Set a new timeout for the update
     timeoutRef.current = setTimeout(() => {
-      // Only update if the value has changed
-      if (newValue !== value) {
-        updateSupabaseData(newValue);
-      }
+      // Get the current value directly from the input element
+      const currentValue = inputRef.current.value;
+      updateSupabaseData(currentValue);
     }, debounceTime);
   };
 
@@ -195,8 +165,9 @@ export default function SupabaseInput({
   return (
     <div className="relative">
       <input
+        ref={inputRef}
         type={type}
-        value={inputValue}
+        defaultValue={value}
         onChange={handleChange}
         className={`${className} ${error ? 'border-red-500' : ''}`}
         {...inputProps}
