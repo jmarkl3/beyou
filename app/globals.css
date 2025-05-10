@@ -26,7 +26,7 @@ html, body {
 }
 
 body > div > div:not(:first-child) {
-  background: url('/site-background.jpeg') no-repeat center center fixed;
+  /* background: url('/site-background.jpeg') no-repeat center center fixed; */
   background-size: cover;
   background-attachment: fixed;
 }
