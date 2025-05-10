@@ -15,9 +15,43 @@ export default function AuthMenu() {
     dispatch(closeAuthMenu());
   };
 
-  // Sign in with Supabase
-  const signInWithSupabase = async (email, password) => {
-    console.log('Step 1: Starting sign in process with Supabase');
+  // Helper function to determine if input is email or phone
+  const isPhoneNumber = (input) => {
+    // First check if it contains an @ symbol - if so, it's an email
+    if (input.includes('@')) {
+      return false;
+    }
+    
+    // If no @ symbol, check if it's mostly digits
+    // Remove common phone number formatting characters
+    const digitsOnly = input.replace(/[\s()-+.]/g, '');
+    
+    // If it's at least 10 digits (standard US phone number length) and mostly numbers
+    return digitsOnly.length >= 10 && /^[0-9]+$/.test(digitsOnly);
+  };
+
+  // Format phone number to E.164 format for Supabase
+  const formatPhoneNumber = (phone) => {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '');
+    
+    // If it's a US number without country code, add +1
+    if (digits.length === 10) {
+      return `+1${digits}`;
+    }
+    
+    // If it already has country code (11 digits starting with 1 for US)
+    if (digits.length === 11 && digits.startsWith('1')) {
+      return `+${digits}`;
+    }
+    
+    // Otherwise, just add + (assuming it's already in international format)
+    return `+${digits}`;
+  };
+  
+  // Sign in with Email
+  const signInWithEmail = async (email, password) => {
+    console.log('Step 1: Starting sign in process with email');
     try {
       console.log('Step 2: Validating input');
       if (!email || !password) {
@@ -51,9 +85,62 @@ export default function AuthMenu() {
     }
   };
   
-  // Sign up with Supabase
-  const signUpWithSupabase = async (email, password, passwordConfirm) => {
-    console.log('Step 1: Starting sign up process with Supabase');
+  // Sign in with Phone
+  const signInWithPhone = async (phone, password) => {
+    console.log('Step 1: Starting sign in process with phone');
+    try {
+      console.log('Step 2: Validating input');
+      if (!phone || !password) {
+        throw new Error('Please enter both phone number and password');
+      }
+      
+      // Format phone number to E.164 format
+      const formattedPhone = formatPhoneNumber(phone);
+      console.log('Step 3: Formatted phone number:', formattedPhone);
+      
+      console.log('Step 4: Attempting to sign in with phone and password');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        phone: formattedPhone,
+        password,
+      });
+      
+      if (error) {
+        console.error('Step 5: Sign in error:', error.message);
+        throw error;
+      }
+      
+      console.log('Step 5: Sign in successful');
+      console.log('Step 6: User data:', data.user);
+      
+      // Close auth menu and redirect to account page
+      console.log('Step 7: Closing auth menu and redirecting to account page');
+      dispatch(closeAuthMenu());
+      router.push('/account');
+      
+      return data;
+    } catch (error) {
+      console.error('Sign in error:', error.message);
+      setError(error.message);
+      return null;
+    }
+  };
+  
+  // Sign in with either email or phone
+  const signInWithSupabase = async (identifier, password) => {
+    console.log('Step 1: Determining if identifier is email or phone');
+    
+    if (isPhoneNumber(identifier)) {
+      console.log('Step 2: Identifier is a phone number');
+      return signInWithPhone(identifier, password);
+    } else {
+      console.log('Step 2: Identifier is an email');
+      return signInWithEmail(identifier, password);
+    }
+  };
+  
+  // Sign up with Email
+  const signUpWithEmail = async (email, password, passwordConfirm) => {
+    console.log('Step 1: Starting sign up process with email');
     try {
       console.log('Step 2: Validating input');
       if (!email || !password) {
@@ -91,21 +178,79 @@ export default function AuthMenu() {
       return null;
     }
   };
+  
+  // Sign up with Phone
+  const signUpWithPhone = async (phone, password, passwordConfirm) => {
+    console.log('Step 1: Starting sign up process with phone');
+    try {
+      console.log('Step 2: Validating input');
+      if (!phone || !password) {
+        throw new Error('Please fill in all fields');
+      }
+      
+      if (password !== passwordConfirm) {
+        throw new Error('Passwords do not match');
+      }
+      
+      // Format phone number to E.164 format
+      const formattedPhone = formatPhoneNumber(phone);
+      console.log('Step 3: Formatted phone number:', formattedPhone);
+      
+      console.log('Step 4: Attempting to sign up with phone and password');
+      const { data, error } = await supabase.auth.signUp({
+        phone: formattedPhone,
+        password,
+      });
+      
+      if (error) {
+        console.error('Step 5: Sign up error:', error.message);
+        throw error;
+      }
+      
+      console.log('Step 5: Sign up successful');
+      console.log('Step 6: User data:', data.user);
+      console.log('Step 7: Phone confirmation status:', data.session ? 'No confirmation needed' : 'Confirmation SMS sent');
+      
+      // Close auth menu and redirect to account page
+      console.log('Step 8: Closing auth menu and redirecting to account page');
+      dispatch(closeAuthMenu());
+      router.push('/account');
+      
+      return data;
+    } catch (error) {
+      console.error('Sign up error:', error.message);
+      setError(error.message);
+      return null;
+    }
+  };
+  
+  // Sign up with either email or phone
+  const signUpWithSupabase = async (identifier, password, passwordConfirm) => {
+    console.log('Step 1: Determining if identifier is email or phone');
+    
+    if (isPhoneNumber(identifier)) {
+      console.log('Step 2: Identifier is a phone number');
+      return signUpWithPhone(identifier, password, passwordConfirm);
+    } else {
+      console.log('Step 2: Identifier is an email');
+      return signUpWithEmail(identifier, password, passwordConfirm);
+    }
+  };
 
   const handleAuth = async () => {
     // Get input values using getElementById
-    const email = document.getElementById('email').value;
+    const identifier = document.getElementById('identifier').value;
     const password = document.getElementById('password').value;
     
     setError('');
     
     if (isLogin) {
-      console.log('Login attempt initiated with email:', email);
-      await signInWithSupabase(email, password);
+      console.log('Login attempt initiated with identifier:', identifier);
+      await signInWithSupabase(identifier, password);
     } else {
       const passwordConfirm = document.getElementById('passwordConfirm').value;
-      console.log('Sign up attempt initiated with email:', email);
-      await signUpWithSupabase(email, password, passwordConfirm);
+      console.log('Sign up attempt initiated with identifier:', identifier);
+      await signUpWithSupabase(identifier, password, passwordConfirm);
     }
   };
 
@@ -132,10 +277,10 @@ export default function AuthMenu() {
         <div>
           <div className="mb-4">
             <input
-              type="email"
-              id="email"
+              type="text"
+              id="identifier"
               className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Email"
+              placeholder="Email or Phone (ex: 123-456-7890)"
             />
           </div>
           
