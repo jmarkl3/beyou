@@ -51,10 +51,19 @@ export default function ClientsPage() {
         let filteredClients = data || [];
         
         // Filter for only my clients if selected
-        if (onlyMyClients && userData.clients) {
+        if (onlyMyClients) {
+          // Make sure userData.clients exists and is an array
+          const myClients = Array.isArray(userData.clients) ? userData.clients : [];
+          
+          // Only show clients whose auth_id is in the user's clients array
           filteredClients = filteredClients.filter(client => 
-            userData.clients.includes(client.auth_id)
+            client && client.auth_id && myClients.includes(client.auth_id)
           );
+          
+          console.log('Filtering for my clients:', {
+            myClientsArray: myClients,
+            filteredCount: filteredClients.length
+          });
         }
         
         // Hide staff users if selected
