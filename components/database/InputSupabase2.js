@@ -9,7 +9,7 @@ import { supabase } from '../../app/utils/supabase/client';
  * @param {string} props.attribute - The column/attribute to update
  * @param {string} props.identifier - The value to identify the record (e.g. auth_id value)
  * @param {string} props.identifierName - The column name for the identifier (defaults to 'id')
- * @param {function} props.onChange - Optional callback function when value changes
+ * @param {function} props.updateCallback - Optional callback function when database update succeeds
  * @param {string} props.initialValue - Initial value for the input
  * @param {string} props.placeholder - Placeholder text for the input
  * @param {string} props.className - Additional CSS classes for the input
@@ -20,6 +20,7 @@ export default function InputSupabase2({
   attribute,
   identifier,
   identifierName = 'id',
+  updateCallback,
   onChange,
   initialValue = '',
   placeholder = '',
@@ -100,6 +101,11 @@ export default function InputSupabase2({
       setUpdateState('success');
       setMessage(`Saved at ${timeString}`);
       console.log(`Updated ${table}.${attribute} for ${identifierName}=${identifier}:`, data);
+      
+      // Call the update callback function with the updated data if provided
+      if (updateCallback && data && data.length > 0) {
+        updateCallback(currentValue, data[0]);
+      }
       
     } catch (error) {
       console.error('Exception updating database:', error);

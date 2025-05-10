@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setAuthId, openAuthMenu } from '../../redux/MainSlice';
+import { setAuthId, openAuthMenu, setUserData } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 import InputSupabase from '../../components/database/InputSupabase';
 import InputSupabase2 from '@/components/database/InputSupabase2';
@@ -36,9 +36,19 @@ export default function AccountPage() {
   };
 
 
-  // Log input changes (optional)
-  const handleInputChange = (value, field) => {
-    console.log(`Field ${field} changed to: ${value}`);
+  // Update Redux when database update succeeds
+  const handleUpdateCallback = (value, updatedData) => {
+    if (updatedData) {
+      console.log('Updating Redux with new data:', updatedData);
+      // Update the Redux store with the new data
+      dispatch(setUserData({ ...userData, ...updatedData }));
+    }
+  };
+  
+  // Handle input changes (for any additional processing if needed)
+  const handleInputChange = (value) => {
+    // This function can be used for immediate UI feedback or validation
+    // Currently not needed but kept for potential future use
   };
 
   const handleOpenAuthMenu = () => {
@@ -110,7 +120,8 @@ export default function AccountPage() {
                 identifierName="auth_id"
                 initialValue={userData[field.key] || ''}
                 placeholder={`Enter your ${field.label.toLowerCase()}`}
-                onChange={(value) => handleInputChange(value, field.key)}
+                updateCallback={handleUpdateCallback}
+                onChange={handleInputChange}
                 className="border-gray-300"
                 isTextarea={field.type === 'textarea'}
                 rows={field.rows || 3}
