@@ -59,6 +59,10 @@ export default function AccountPage() {
     router.push('/');
   };
 
+  const handleGoToJournal = () => {
+    router.push('/journal');
+  };
+
   if (!auth_id) {
     return (
       <div className="container mx-auto px-4 py-20 max-w-4xl">
@@ -91,7 +95,9 @@ export default function AccountPage() {
       <h1 className="text-3xl font-bold mb-6">My Account</h1>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white">
+        <div 
+          onClick={handleGoToJournal}
+          className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white hover:shadow-xl">
           <div className="mb-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
