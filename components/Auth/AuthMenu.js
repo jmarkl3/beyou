@@ -1,8 +1,34 @@
 'use client';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { closeAuthMenu, setUserId } from '../../redux/MainSlice';
+import { closeAuthMenu, setUserId, setAccountData } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
+import supabase from '../../app/supabase/client';
+
+// Helper function to check if input is an email
+const isEmail = (input) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(input);
+};
+
+// Helper function to format phone number for Supabase
+const formatPhoneNumber = (phoneNumber) => {
+  // Remove all non-digit characters
+  const digits = phoneNumber.replace(/\D/g, '');
+  
+  // Ensure it's a US number (add country code if needed)
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+  
+  // If it already has a country code (e.g. starts with 1)
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+  
+  // Return as is with + prefix if it seems to already have a country code
+  return `+${digits}`;
+};
 
 export default function AuthMenu() {
   const dispatch = useDispatch();
@@ -14,31 +40,66 @@ export default function AuthMenu() {
     dispatch(closeAuthMenu());
   };
 
-  const handleAuth = () => {
+  // Sample user data to be set when user logs in
+  const sampleAccountData = {
+    name: 'John Doe',
+    preferredName: 'Johnny',
+    email: 'user@example.com',
+    phone: '(555) 123-4567'
+  };
+
+  const handleAuth = async () => {
     // Get input values using getElementById
-    const email = document.getElementById('email').value;
+    const emailOrPhone = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     
     setError('');
     
     if (isLogin) {
-      console.log('Login attempt with:', { email, password });
-      // Simple validation - in a real app, this would be a server call
-      if (email && password) {
-        console.log("hello")
-        // Simulate successful login
-        dispatch(setUserId('test'));
+      if (!emailOrPhone || !password) {
+        setError('Please enter both email/phone and password');
+        return;
+      }
+
+      try {
+        let { data, error } = {};
+        
+        if (isEmail(emailOrPhone)) {
+          // Sign in with email
+          ({ data, error } = await supabase.auth.signInWithPassword({
+            email: emailOrPhone,
+            password: password
+          }));
+        } else {
+          // Sign in with phone
+          const formattedPhone = formatPhoneNumber(emailOrPhone);
+          ({ data, error } = await supabase.auth.signInWithPassword({
+            phone: formattedPhone,
+            password: password
+          }));
+        }
+        
+        if (error) throw error;
+        
+        console.log('Login successful:', data.user);
+        
+        // Set user ID in Redux
+        dispatch(setUserId(data.user.id));
+        
+        // Set account data (still using sample data for now)
+        dispatch(setAccountData(sampleAccountData));
+        
+        // Close auth menu and redirect to account page
         dispatch(closeAuthMenu());
         router.push('/account');
-      } else {
-        setError('Please enter both email and password');
+      } catch (error) {
+        console.error('Login error:', error);
+        setError(error.message || 'Failed to sign in');
       }
     } else {
       const passwordConfirm = document.getElementById('passwordConfirm').value;
-      console.log('Sign up attempt with:', { email, password, passwordConfirm });
       
-      // Simple validation - in a real app, this would be a server call
-      if (!email || !password) {
+      if (!emailOrPhone || !password) {
         setError('Please fill in all fields');
         return;
       }
@@ -47,11 +108,42 @@ export default function AuthMenu() {
         setError('Passwords do not match');
         return;
       }
-      
-      // Simulate successful signup
-      dispatch(setUserId('test'));
-      dispatch(closeAuthMenu());
-      router.push('/account');
+
+      try {
+        let { data, error } = {};
+        
+        if (isEmail(emailOrPhone)) {
+          // Sign up with email
+          ({ data, error } = await supabase.auth.signUp({
+            email: emailOrPhone,
+            password: password
+          }));
+        } else {
+          // Sign up with phone
+          const formattedPhone = formatPhoneNumber(emailOrPhone);
+          ({ data, error } = await supabase.auth.signUp({
+            phone: formattedPhone,
+            password: password
+          }));
+        }
+        
+        if (error) throw error;
+        
+        console.log('Signup successful:', data.user);
+        
+        // Set user ID in Redux
+        dispatch(setUserId(data.user.id));
+        
+        // Set account data (still using sample data for now)
+        dispatch(setAccountData(sampleAccountData));
+        
+        // Close auth menu and redirect to account page
+        dispatch(closeAuthMenu());
+        router.push('/account');
+      } catch (error) {
+        console.error('Signup error:', error);
+        setError(error.message || 'Failed to sign up');
+      }
     }
   };
 
@@ -78,10 +170,10 @@ export default function AuthMenu() {
         <div>
           <div className="mb-4">
             <input
-              type="email"
+              type="text"
               id="email"
               className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Email"
+              placeholder="Email or Phone (ex: +15551234567)"
             />
           </div>
           
