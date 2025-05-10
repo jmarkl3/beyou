@@ -4,13 +4,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setAuthId, openAuthMenu } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 import InputSupabase from '../../components/database/InputSupabase';
+import InputSupabase2 from '@/components/database/InputSupabase2';
 
 // Account input fields configuration
 const accountInputFields = [
-  { key: 'name', label: 'Name' },
-  { key: 'preferred_name', label: 'Preferred Name' },
-  { key: 'email', label: 'Email' },
-  { key: 'phone', label: 'Phone' }
+  { key: 'name', label: 'Name', type: 'input' },
+  { key: 'preferred_name', label: 'Preferred Name', type: 'input' },
+  { key: 'email', label: 'Email', type: 'input' },
+  { key: 'phone', label: 'Phone', type: 'input' },
+  { key: 'note', label: 'Note', type: 'textarea', rows: 4 }
 ];
 
 export default function AccountPage() {
@@ -101,7 +103,7 @@ export default function AccountPage() {
           <div className="mb-4" key={field.key}>
             <p className="text-gray-600">{field.label}:</p>
             {isEditing ? (
-              <InputSupabase
+              <InputSupabase2
                 table="users"
                 attribute={field.key}
                 identifier={auth_id}
@@ -110,9 +112,17 @@ export default function AccountPage() {
                 placeholder={`Enter your ${field.label.toLowerCase()}`}
                 onChange={(value) => handleInputChange(value, field.key)}
                 className="border-gray-300"
+                isTextarea={field.type === 'textarea'}
+                rows={field.rows || 3}
               />
             ) : (
-              <p className="font-medium">{userData[field.key] || ''}</p>
+              field.type === 'textarea' ? (
+                <div className="whitespace-pre-wrap font-medium border p-2 rounded-md bg-gray-50">
+                  {userData[field.key] || 'No notes added yet.'}
+                </div>
+              ) : (
+                <p className="font-medium">{userData[field.key] || ''}</p>
+              )
             )}
           </div>
         ))}
