@@ -1,8 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setViewedClientId, setViewedClientData } from '../../redux/MainSlice';
-import { supabase } from '../utils/supabase/client';
 import ClientInformation from './components/ClientInformation';
 import ClientSessions from './components/ClientSessions';
 import ClientJournals from './components/ClientJournals';
@@ -13,51 +12,17 @@ const ClientView = () => {
   const viewedClientId = useSelector((state) => state.main.viewedClientId);
   const viewedClientData = useSelector((state) => state.main.viewedClientData);
   const [loading, setLoading] = useState(false);
-  
+
   // Handle closing the client view
   const handleClose = () => {
     dispatch(setViewedClientId(null));
     dispatch(setViewedClientData(null));
   };
-  
-  // Load client data when viewedClientId changes
-  useEffect(() => {
-    const loadClientData = async () => {
-      if (!viewedClientId) {
-        dispatch(setViewedClientData(null));
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('auth_id', viewedClientId)
-          .single();
-
-        if (error) {
-          console.error('Error loading client data:', error);
-          return;
-        }
-
-        dispatch(setViewedClientData(data));
-      } catch (error) {
-        console.error('Failed to load client data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadClientData();
-  }, [viewedClientId, dispatch]);
 
   // If no client is being viewed, don't render anything
   if (!viewedClientId || !viewedClientData) {
     return null;
   }
-
-  // No additional functions needed - all functionality is now in component files
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
