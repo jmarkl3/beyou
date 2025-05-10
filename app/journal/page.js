@@ -156,7 +156,7 @@ export default function JournalPage() {
               <h2 className="text-xl font-semibold mb-4">{entry.display}</h2>
               
               <div className="mb-6">
-                <h3 className="text-lg font-medium mb-2 text-blue-600">Public Entry</h3>
+                <h3 className="text-lg font-medium mb-2 text-blue-600">Open Entry (Visible to your counsellor)</h3>
                 <InputSupabase2
                   table="journal_entries"
                   attribute="content"
@@ -188,7 +188,7 @@ export default function JournalPage() {
               </div>
               
               <div>
-                <h3 className="text-lg font-medium mb-2 text-purple-600">Private Entry</h3>
+                <h3 className="text-lg font-medium mb-2 text-purple-600">Private Entry (Visible only to you)</h3>
                 <InputSupabase2
                   table="journal_entries"
                   attribute="content"
