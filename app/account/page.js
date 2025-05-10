@@ -90,6 +90,26 @@ export default function AccountPage() {
     <div className="container mx-auto px-4 py-20 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6">My Account</h1>
       
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white">
+          <div className="mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <h3 className="text-base font-semibold">Journaling</h3>
+        </div>
+        
+        <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white">
+          <div className="mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-base font-semibold">Join Session</h3>
+        </div>
+      </div>
+
       <div className="bg-white rounded-lg shadow-md p-6 mb-6 relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Account Information</h2>
