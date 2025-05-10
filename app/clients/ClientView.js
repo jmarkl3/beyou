@@ -322,27 +322,23 @@ const ClientView = () => {
                 onClick={() => setInfoSectionOpen(!infoSectionOpen)}
               >
                 <h3 className="text-lg font-semibold">Client Information</h3>
-                <div className="flex items-center">
-                  {infoSectionOpen && (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditing(!isEditing);
-                      }} 
-                      className="text-blue-500 hover:text-blue-700 font-bold mr-3"
-                      aria-label={isEditing ? "Cancel editing" : "Edit client information"}
-                    >
-                      {isEditing ? "✕" : "✎"}
-                    </button>
-                  )}
-                  <span className="text-gray-500">
-                    {infoSectionOpen ? '▼' : '►'}
-                  </span>
-                </div>
+                <span className="text-gray-500">
+                  {infoSectionOpen ? '▼' : '►'}
+                </span>
               </div>
               
               {infoSectionOpen && (
                 <div className="p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="font-medium">Personal Details</h4>
+                    <button 
+                      onClick={() => setIsEditing(!isEditing)} 
+                      className="text-blue-500 hover:text-blue-700 font-bold"
+                      aria-label={isEditing ? "Cancel editing" : "Edit client information"}
+                    >
+                      {isEditing ? "✕" : "✎"}
+                    </button>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {clientInputFields.map((field) => (
                       <div className="mb-4" key={field.key}>
@@ -472,23 +468,9 @@ const ClientView = () => {
                 onClick={() => setJournalsSectionOpen(!journalsSectionOpen)}
               >
                 <h3 className="text-lg font-semibold">Client Journals</h3>
-                <div className="flex items-center">
-                  {!journalsSectionOpen && journals.length === 0 && (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLoadJournals();
-                      }} 
-                      className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm transition-colors mr-3"
-                      disabled={loading}
-                    >
-                      Load Journals
-                    </button>
-                  )}
-                  <span className="text-gray-500">
-                    {journalsSectionOpen ? '▼' : '►'}
-                  </span>
-                </div>
+                <span className="text-gray-500">
+                  {journalsSectionOpen ? '▼' : '►'}
+                </span>
               </div>
               
               {journalsSectionOpen && (
