@@ -5,6 +5,7 @@ import { setAuthId, openAuthMenu, setUserData } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 import InputSupabase from '../../components/database/InputSupabase';
 import InputSupabase2 from '@/components/database/InputSupabase2';
+import { supabase } from '../utils/supabase/client';
 
 // Account input fields configuration
 const accountInputFields = [
@@ -36,12 +37,41 @@ export default function AccountPage() {
   };
 
 
-  // Update Redux when database update succeeds
-  const handleUpdateCallback = (value, updatedData) => {
-    if (updatedData) {
-      console.log('Updating Redux with new data:', updatedData);
-      // Update the Redux store with the new data
-      dispatch(setUserData({ ...userData, ...updatedData }));
+  // Update Redux when database update succeeds and sync auth data if needed
+  const handleUpdateCallback = async (value, updatedData) => {
+    if (!updatedData) return;
+    
+    console.log('Updating Redux with new data:', updatedData);
+    // Update the Redux store with the new data
+    dispatch(setUserData({ ...userData, ...updatedData }));
+    
+    // If email or phone was updated, also update the auth profile
+    if (updatedData.email !== undefined || updatedData.phone !== undefined) {
+      try {
+        const updateData = {};
+        
+        if (updatedData.email !== undefined) {
+          updateData.email = updatedData.email;
+        }
+        
+        if (updatedData.phone !== undefined) {
+          updateData.phone = updatedData.phone;
+        }
+        
+        // Only proceed if we have data to update
+        if (Object.keys(updateData).length > 0) {
+          const { data, error } = await supabase.auth.updateUser(updateData);
+          
+          if (error) {
+            console.error('Error updating auth profile:', error);
+            alert(`Failed to update authentication profile: ${error.message}`);
+          } else {
+            console.log('Auth profile updated successfully:', data);
+          }
+        }
+      } catch (err) {
+        console.error('Error in auth update:', err);
+      }
     }
   };
   
@@ -119,13 +149,20 @@ export default function AccountPage() {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6 relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Account Information</h2>
-          <button 
-            onClick={()=>setIsEditing(!isEditing)} 
-            className="text-blue-500 hover:text-blue-700 font-bold"
-            aria-label={isEditing ? "Cancel editing" : "Edit account information"}
-          >
-            {isEditing ? "✕" : "✎"}
-          </button>
+          <div className="flex items-center gap-2">
+            {isEditing && (
+              <div className="text-sm text-gray-500">
+                <span role="tooltip" title="Changes to email or phone will also update your login credentials">ℹ️ Email/phone changes update login credentials</span>
+              </div>
+            )}
+            <button 
+              onClick={()=>setIsEditing(!isEditing)} 
+              className="text-blue-500 hover:text-blue-700 font-bold"
+              aria-label={isEditing ? "Cancel editing" : "Edit account information"}
+            >
+              {isEditing ? "✕" : "✎"}
+            </button>
+          </div>
         </div>
         
         <div className="mb-4">
