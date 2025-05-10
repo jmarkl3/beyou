@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setAuthId, openAuthMenu } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
+import InputSupabase from '../../components/database/InputSupabase';
 
 // Account input fields configuration
 const accountInputFields = [
@@ -33,17 +34,9 @@ export default function AccountPage() {
   };
 
 
-  const handleInputChange = (e) => {
-    // This would need to be updated to modify the Redux store directly
-    // or to call a Supabase update function
-    console.log('Input change:', e.target.name, e.target.value);
-    // For now, just log the change but don't update anything
-  };
-
-  const handleSave = () => {
-    // Here you would typically save the data to your backend
-    // For now, we'll just exit edit mode
-    setIsEditing(false);
+  // Log input changes (optional)
+  const handleInputChange = (value, field) => {
+    console.log(`Field ${field} changed to: ${value}`);
   };
 
   const handleOpenAuthMenu = () => {
@@ -108,15 +101,18 @@ export default function AccountPage() {
           <div className="mb-4" key={field.key}>
             <p className="text-gray-600">{field.label}:</p>
             {isEditing ? (
-              <input
-                type="text"
-                name={field.key}
-                value={userData[field.key]}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
+              <InputSupabase
+                table="users"
+                attribute={field.key}
+                identifier={auth_id}
+                identifierName="auth_id"
+                initialValue={userData[field.key] || ''}
+                placeholder={`Enter your ${field.label.toLowerCase()}`}
+                onChange={(value) => handleInputChange(value, field.key)}
+                className="border-gray-300"
               />
             ) : (
-              <p className="font-medium">{userData[field.key]}</p>
+              <p className="font-medium">{userData[field.key] || ''}</p>
             )}
           </div>
         ))}
