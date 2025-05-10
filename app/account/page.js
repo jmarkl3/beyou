@@ -13,6 +13,7 @@ const accountInputFields = [
   { key: 'preferred_name', label: 'Preferred Name', type: 'input' },
   { key: 'email', label: 'Email', type: 'input' },
   { key: 'phone', label: 'Phone', type: 'input' },
+  { key: 'type', label: 'Account Type', type: 'input', readonly: true },
   { key: 'note', label: 'Note', type: 'textarea', rows: 4 }
 ];
 
@@ -93,6 +94,11 @@ export default function AccountPage() {
     router.push('/journal');
   };
 
+  // For debugging purposes
+  useEffect(() => {
+    console.log('Current user data:', userData);
+  }, [userData]);
+
   if (!auth_id) {
     return (
       <div className="container mx-auto px-4 py-20 max-w-4xl">
@@ -144,8 +150,34 @@ export default function AccountPage() {
           </div>
           <h3 className="text-base font-semibold">Join Session</h3>
         </div>
+        
+        {userData.type === 'staff' && (
+          <>
+            <div 
+              onClick={() => router.push('/video-url-bulder')}
+              className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white hover:shadow-xl">
+              <div className="mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold">Meeting Link Builder</h3>
+            </div>
+            
+            <div 
+              onClick={() => router.push('/clients')}
+              className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white hover:shadow-xl">
+              <div className="mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold">Clients</h3>
+            </div>
+          </>
+        )}
       </div>
-
+      
       <div className="bg-white rounded-lg shadow-md p-6 mb-6 relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Account Information</h2>
@@ -188,6 +220,7 @@ export default function AccountPage() {
                 className="border-gray-300"
                 isTextarea={field.type === 'textarea'}
                 rows={field.rows || 3}
+                readOnly={field.readonly}
               />
             ) : (
               field.type === 'textarea' ? (
