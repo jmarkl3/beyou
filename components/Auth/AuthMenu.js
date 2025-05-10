@@ -40,12 +40,14 @@ export default function AuthMenu() {
     dispatch(closeAuthMenu());
   };
 
-  // Sample user data to be set when user logs in
-  const sampleAccountData = {
-    name: 'John Doe',
-    preferredName: 'Johnny',
-    email: 'user@example.com',
-    phone: '(555) 123-4567'
+  // Create initial account data based on signup information
+  const createInitialAccountData = (emailOrPhone, isEmailType) => {
+    return {
+      name: '',
+      preferred_name: '',
+      email: isEmailType ? emailOrPhone : '',
+      phone: !isEmailType ? emailOrPhone : ''
+    };
   };
 
   const handleAuth = async () => {
@@ -86,8 +88,9 @@ export default function AuthMenu() {
         // Set user ID in Redux
         dispatch(setUserId(data.user.id));
         
-        // Set account data (still using sample data for now)
-        dispatch(setAccountData(sampleAccountData));
+        // Create initial account data based on login method
+        const initialData = createInitialAccountData(emailOrPhone, isEmail(emailOrPhone));
+        dispatch(setAccountData(initialData));
         
         // Close auth menu and redirect to account page
         dispatch(closeAuthMenu());
@@ -131,11 +134,36 @@ export default function AuthMenu() {
         
         console.log('Signup successful:', data.user);
         
+        // Create a new user in the users table with email/phone and password
+        const userData = {
+          auth_id: data.user.id,
+          password: password, // Store password temporarily for recovery purposes
+          created_at: new Date().toISOString()
+        };
+        
+        // Add email or phone based on what was used for signup
+        if (isEmail(emailOrPhone)) {
+          userData.email = emailOrPhone;
+        } else {
+          userData.phone = formatPhoneNumber(emailOrPhone);
+        }
+        
+        // Insert the user data into the users table
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([userData]);
+        
+        if (insertError) {
+          console.error('Error inserting user data:', insertError);
+          // Continue anyway since auth was successful
+        }
+        
         // Set user ID in Redux
         dispatch(setUserId(data.user.id));
         
-        // Set account data (still using sample data for now)
-        dispatch(setAccountData(sampleAccountData));
+        // Create initial account data based on login method
+        const initialData = createInitialAccountData(emailOrPhone, isEmail(emailOrPhone));
+        dispatch(setAccountData(initialData));
         
         // Close auth menu and redirect to account page
         dispatch(closeAuthMenu());

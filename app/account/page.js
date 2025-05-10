@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUserId, selectAccountData } from '../../redux/MainSlice';
+import { selectUserId, selectAccountData, setAccountData } from '../../redux/MainSlice';
 import { useRouter } from 'next/navigation';
 import supabase from '../supabase/client';
+import SupabaseInput from '../../components/SupabaseInput';
 
 export default function AccountPage() {
   const userId = useSelector(selectUserId);
@@ -12,10 +13,10 @@ export default function AccountPage() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   
-  // Define the account fields to display
+  // Define the account fields to display with database field names
   const accountFields = [
     { id: 'name', label: 'Name', type: 'text' },
-    { id: 'preferredName', label: 'Preferred Name', type: 'text' },
+    { id: 'preferred_name', label: 'Preferred Name', type: 'text' },
     { id: 'email', label: 'Email', type: 'email' },
     { id: 'phone', label: 'Phone', type: 'tel' }
   ];
@@ -44,6 +45,8 @@ export default function AccountPage() {
     return null; // Don't render anything while redirecting
   }
 
+  
+  
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
@@ -95,11 +98,21 @@ export default function AccountPage() {
           <div className="mb-4" key={field.id}>
             <p className="text-gray-600">{field.label}:</p>
             {isEditing ? (
-              <input
-                type={field.type}
+              <SupabaseInput
+                tableName="users"
+                fieldName={field.id}
+                rowId={userId}
+                rowIdField="auth_id"
                 value={accountData[field.id] || ''}
+                type={field.type}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                readOnly
+                onUpdate={(fieldName, newValue) => {
+                  // Update Redux store with the new value
+                  dispatch(setAccountData({
+                    ...accountData,
+                    [fieldName]: newValue
+                  }));
+                }}
               />
             ) : (
               <p className="font-medium">{accountData[field.id]}</p>
