@@ -23,6 +23,7 @@ export default function AccountPage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [updateError, setUpdateError] = useState('');
   
   // Log user data from Redux
   const logUserData = () => {
@@ -65,9 +66,10 @@ export default function AccountPage() {
           
           if (error) {
             console.error('Error updating auth profile:', error);
-            alert(`Failed to update authentication profile: ${error.message}`);
+            setUpdateError(`Failed to update profile: ${error.message}`);
           } else {
             console.log('Auth profile updated successfully:', data);
+            setUpdateError('');
           }
         }
       } catch (err) {
@@ -181,21 +183,20 @@ export default function AccountPage() {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6 relative">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Account Information</h2>
-          <div className="flex items-center gap-2">
-            {isEditing && (
-              <div className="text-sm text-gray-500">
-                <span role="tooltip" title="Changes to email or phone will also update your login credentials">ℹ️ Email/phone changes update login credentials</span>
-              </div>
-            )}
-            <button 
-              onClick={()=>setIsEditing(!isEditing)} 
-              className="text-blue-500 hover:text-blue-700 font-bold"
-              aria-label={isEditing ? "Cancel editing" : "Edit account information"}
-            >
-              {isEditing ? "✕" : "✎"}
-            </button>
-          </div>
+          <button 
+            onClick={()=>setIsEditing(!isEditing)} 
+            className="text-blue-500 hover:text-blue-700 font-bold"
+            aria-label={isEditing ? "Cancel editing" : "Edit account information"}
+          >
+            {isEditing ? "✕" : "✎"}
+          </button>
         </div>
+        
+        {updateError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+            {updateError}
+          </div>
+        )}
         
         {accountInputFields.map((field) => {
           // Skip fields marked as adminOnly if user is not an admin or staff

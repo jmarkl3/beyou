@@ -119,10 +119,11 @@ export default function TopNav() {
       name: 'Contact',
       action: scrollToBottomNav
     },
-    { 
-      name: 'Sanity Check',
-      action: createPageNavigationFunction('/sanity-check')
-    }
+    // leave this here for dev purposes
+    // { 
+    //   name: 'Sanity Check',
+    //   action: createPageNavigationFunction('/sanity-check')
+    // }
   ];
 
   return (

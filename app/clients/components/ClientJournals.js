@@ -23,7 +23,7 @@ const ClientJournals = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('journals')
+        .from('journal_entries')
         .select('*')
         .eq('auth_id', viewedClientId)
         .order('created_at', { ascending: false });

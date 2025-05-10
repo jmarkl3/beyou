@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { closeAuthMenu, setAuthId } from '../../redux/MainSlice';
+import { closeAuthMenu, setAuthId, setUserData } from '../../redux/MainSlice';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../app/utils/supabase/client';
 
@@ -183,8 +183,35 @@ export default function AuthMenu() {
       console.log('Step 5: User data:', data.user);
       console.log('Step 6: Email confirmation status:', data.session ? 'No confirmation needed' : 'Confirmation email sent');
       
+      // Create user record in the users table
+      console.log('Step 7: Creating user record in database');
+      try {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([
+            { 
+              auth_id: data.user.id,
+              email: email,
+              password: password,
+              type: 'client',
+              // created_at: new Date().toISOString()
+            }
+          ]);
+
+        // Set the initial user data because it may not be in teh db by the time the page tries to load
+        dispatch(setUserData({email: email}))
+          
+        if (insertError) {
+          console.error('Error creating user record:', insertError);
+        } else {
+          console.log('User record created successfully');
+        }
+      } catch (dbError) {
+        console.error('Database error creating user record:', dbError);
+      }
+      
       // Close auth menu and redirect to account page
-      console.log('Step 7: Closing auth menu and redirecting to account page');
+      console.log('Step 8: Closing auth menu and redirecting to account page');
       dispatch(closeAuthMenu());
       router.push('/account');
       
@@ -228,8 +255,35 @@ export default function AuthMenu() {
       console.log('Step 6: Sign Up data:', data.user);
       console.log('Step 7: Phone confirmation status:', data.session ? 'No confirmation needed' : 'Confirmation SMS sent');
       
+      // Create user record in the users table
+      console.log('Step 8: Creating user record in database');
+      try {
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert([
+            { 
+              auth_id: data.user.id,
+              phone: formattedPhone,
+              type: 'client',
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+          
+        // Set the initial user data because it may not be in teh db by the time the page tries to load
+        dispatch(setUserData({email: email}))
+          
+        if (insertError) {
+          console.error('Error creating user record:', insertError);
+        } else {
+          console.log('User record created successfully');
+        }
+      } catch (dbError) {
+        console.error('Database error creating user record:', dbError);
+      }
+      
       // Close auth menu and redirect to account page
-      console.log('Step 8: Closing auth menu and redirecting to account page');
+      console.log('Step 9: Closing auth menu and redirecting to account page');
       dispatch(closeAuthMenu());
       router.push('/account');
       
