@@ -81,15 +81,20 @@ export default function AccountPage() {
           <button 
             onClick={handleEditToggle} 
             className="text-blue-600 hover:text-blue-800 transition-colors"
+            title={isEditing ? "Done" : "Edit"}
           >
             {isEditing ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              <div title="Done">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
+              <div title="Edit">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
             )}
           </button>
         </div>
@@ -106,7 +111,10 @@ export default function AccountPage() {
                 value={accountData[field.id] || ''}
                 type={field.type}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                debounceTime={500}
+                debug={true}
                 onUpdate={(fieldName, newValue) => {
+                  console.log('Field updated:', fieldName, newValue);
                   // Update Redux store with the new value
                   dispatch(setAccountData({
                     ...accountData,
