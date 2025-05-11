@@ -2,128 +2,213 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { supabase } from '../utils/supabase/client';
-import InputSupabase2 from '../../components/database/InputSupabase2';
+import JournalEntry from './JournalEntry';
+
+// Set to true to enable development testing features
+const developerTesting = false;
 
 export default function JournalPage() {
   const auth_id = useSelector((state) => state.main.auth_id);
   const [journalEntries, setJournalEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
 
-  // Generate dates for the last 7 days
-  const generateDates = () => {
-    const dates = [];
-    for (let i = 0; i < 7; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      dates.push({
-        date: date,
-        formatted: date.toISOString().split('T')[0], // YYYY-MM-DD format
-        display: date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-      });
-    }
-    return dates;
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
   };
 
-  // Get last 7 days of journal entries
-  const fetchJournalEntries = async () => {
+  // Get journal entries with pagination
+  const fetchJournalEntries = async (loadMore = false) => {
     if (!auth_id) return;
-
-    setLoading(true);
+    
+    if (loadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
 
     try {
-      const dates = generateDates();
-      const formattedDates = dates.map(d => d.formatted);
-
-      const { data, error } = await supabase
+      // Get the oldest date we currently have to use as a cursor for pagination
+      const oldestDate = loadMore && journalEntries.length > 0 
+        ? journalEntries[journalEntries.length - 1].date 
+        : null;
+      
+      // Query to get entries
+      let query = supabase
         .from('journal_entries')
         .select('*')
         .eq('auth_id', auth_id)
-        .in('date', formattedDates);
-
-      if (error) throw error;
-
-      // Ensure we have entries for all 7 days
-      const entriesMap = {};
-      if (data) {
-        data.forEach(entry => {
-          if (!entriesMap[entry.date]) {
-            entriesMap[entry.date] = {};
-          }
-          entriesMap[entry.date][entry.type] = entry;
-        });
+        .order('date', { ascending: false })
+        .limit(5);
+      
+      // If loading more, get entries older than our oldest entry
+      if (oldestDate) {
+        query = query.lt('date', oldestDate);
       }
 
-      // Create entries array with all 7 days
-      const entries = dates.map(date => {
-        const existingEntries = entriesMap[date.formatted] || {};
-        return {
-          date: date.date,
-          formatted: date.formatted,
-          display: date.display,
-          public: existingEntries.open || null,
-          private: existingEntries.private || null
-        };
-      });
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      
+      // Check if we have more entries to load
+      setHasMore(data && data.length === 5);
 
-      setJournalEntries(entries);
+      // Get today's date
+      const todayDate = getTodayDate();
+      
+      // Check if today's date is in the entries
+      const hasToday = data ? data.some(entry => entry.date === todayDate) : false;
+      
+      // Create the final entries array
+      let entries = [...(data || [])];
+      
+      if (loadMore) {
+        // Append new entries to existing ones
+        setJournalEntries(prev => {
+          const combined = [...prev, ...entries];
+          // Remove any duplicates (by date)
+          const uniqueEntries = [];
+          const dateSet = new Set();
+          
+          combined.forEach(entry => {
+            if (!dateSet.has(entry.date)) {
+              dateSet.add(entry.date);
+              uniqueEntries.push(entry);
+            }
+          });
+          
+          // Sort by date (newest first)
+          return uniqueEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+        });
+      } else {
+        // Add today's entry if it doesn't exist
+        if (!hasToday) {
+          entries.unshift({
+            date: todayDate,
+            auth_id: auth_id
+          });
+        }
+        
+        // Sort by date (newest first)
+        entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        setJournalEntries(entries);
+      }
     } catch (err) {
       console.error('Error fetching journal entries:', err);
-      setError('Failed to load journal entries. Please try again later.');
+      // Even if there's an error, show today's entry
+      const todayDate = getTodayDate();
+      setJournalEntries([{ date: todayDate, auth_id: auth_id }]);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  // Handle database updates
-  const handleUpdateCallback = (value, updatedData) => {
-    if (!updatedData) return;
+  // No need for handleUpdateCallback anymore as it's handled in the JournalEntry component
 
-    // Update the local state with the new data
-    setJournalEntries(prevEntries => {
-      return prevEntries.map(entry => {
-        if (entry.formatted === updatedData.date) {
-          return {
-            ...entry,
-            [updatedData.type === 'open' ? 'public' : 'private']: updatedData
-          };
+  // Development function to create random test entries
+  const createRandomEntries = async () => {
+    if (!auth_id) return;
+    
+    // Get all existing dates to avoid duplicates
+    const { data: existingEntries } = await supabase
+      .from('journal_entries')
+      .select('date')
+      .eq('auth_id', auth_id);
+    
+    const existingDates = new Set(existingEntries?.map(entry => entry.date) || []);
+    
+    // Generate random dates in the past month that don't already exist
+    const randomDates = [];
+    const today = new Date();
+    
+    // Try to find 10 unique dates
+    for (let attempts = 0; randomDates.length < 10 && attempts < 50; attempts++) {
+      // Random day in the past month (1-30 days ago)
+      const daysAgo = Math.floor(Math.random() * 30) + 1;
+      const randomDate = new Date(today);
+      randomDate.setDate(randomDate.getDate() - daysAgo);
+      
+      const dateString = randomDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      // Only add if this date doesn't already exist
+      if (!existingDates.has(dateString) && !randomDates.includes(dateString)) {
+        randomDates.push(dateString);
+      }
+    }
+    
+    // Random content templates
+    const publicTemplates = [
+      "Today was a productive day. I accomplished several tasks.",
+      "Feeling good about my progress on personal goals.",
+      "Had some challenges today but working through them.",
+      "Met with friends and had a great time.",
+      "Focused on self-care today."
+    ];
+    
+    const privateTemplates = [
+      "Need to remember to follow up on that important matter.",
+      "Personal note: don't forget the appointment next week.",
+      "Reminder to myself about boundaries with certain people.",
+      "My honest thoughts about today's meeting...",
+      "Things I want to work on but haven't told anyone:"
+    ];
+    
+    // Create entries for each random date
+    const entries = randomDates.map(date => ({
+      auth_id,
+      date,
+      content: publicTemplates[Math.floor(Math.random() * publicTemplates.length)],
+      content_private: privateTemplates[Math.floor(Math.random() * privateTemplates.length)],
+      updated_datetime: new Date().toISOString()
+    }));
+    
+    // Insert all entries
+    if (entries.length > 0) {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .insert(entries)
+        .select();
+      
+      if (error) {
+        console.error('Error creating random entries:', error);
+      } else {
+        console.log(`Created ${data.length} random journal entries`);
+        // Refresh the entries list
+        fetchJournalEntries();
+      }
+    }
+  };
+
+  // Handle when a new entry is created in the JournalEntry component
+  const handleEntryCreated = (newEntry) => {
+    if (!newEntry) return;
+    
+    setJournalEntries(prev => {
+      return prev.map(entry => {
+        // Replace the placeholder entry with the real one
+        if (entry.date === newEntry.date && !entry.id) {
+          return newEntry;
         }
         return entry;
       });
     });
   };
 
-  // Create a new journal entry if it doesn't exist
-  const createJournalEntry = async (date, type) => {
-    if (!auth_id) return null;
-
-    try {
-      const newEntry = {
-        auth_id,
-        date: date,
-        type: type,
-        content: '',
-        updated_datetime: new Date().toISOString()
-      };
-
-      const { data, error } = await supabase
-        .from('journal_entries')
-        .insert([newEntry])
-        .select();
-
-      if (error) throw error;
-
-      return data[0];
-    } catch (err) {
-      console.error('Error creating journal entry:', err);
-      return null;
-    }
-  };
-
   // Fetch entries when auth_id changes
   useEffect(() => {
-    fetchJournalEntries();
+    if (auth_id) {
+      fetchJournalEntries();
+    } else {
+      // Even if not logged in, show today's entry
+      const todayDate = getTodayDate();
+      setJournalEntries([{ date: todayDate }]);
+    }
   }, [auth_id]);
 
   // If not logged in
@@ -142,84 +227,59 @@ export default function JournalPage() {
     <div className="container mx-auto px-4 py-10 pt-24 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6">My Journal</h1>
       
-      {loading ? (
+      {loading && journalEntries.length === 0 ? (
         <div className="text-center py-10">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p>Loading journal entries...</p>
         </div>
-      ) : error ? (
-        <div className="bg-red-100 text-red-700 p-4 rounded-md mb-6">{error}</div>
       ) : (
         <div className="space-y-8">
-          {journalEntries.map((entry) => (
-            <div key={entry.formatted} className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">{entry.display}</h2>
-              
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-2 text-blue-600">Open Entry (Visible to your counsellor)</h3>
-                <InputSupabase2
-                  table="journal_entries"
-                  attribute="content"
-                  identifier={entry.public?.id || null}
-                  identifierName="id"
-                  initialValue={entry.public?.content || ''}
-                  placeholder="Write your public journal entry here..."
-                  updateCallback={handleUpdateCallback}
-                  isTextarea={true}
-                  rows={4}
-                  className="w-full"
-                  // If no entry exists yet, create one when focused
-                  onFocus={async () => {
-                    if (!entry.public) {
-                      const newEntry = await createJournalEntry(entry.formatted, 'open');
-                      if (newEntry) {
-                        setJournalEntries(prev => {
-                          return prev.map(e => {
-                            if (e.formatted === entry.formatted) {
-                              return { ...e, public: newEntry };
-                            }
-                            return e;
-                          });
-                        });
-                      }
-                    }
-                  }}
-                />
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-purple-600">Private Entry (Visible only to you)</h3>
-                <InputSupabase2
-                  table="journal_entries"
-                  attribute="content"
-                  identifier={entry.private?.id || null}
-                  identifierName="id"
-                  initialValue={entry.private?.content || ''}
-                  placeholder="Write your private journal entry here..."
-                  updateCallback={handleUpdateCallback}
-                  isTextarea={true}
-                  rows={4}
-                  className="w-full"
-                  // If no entry exists yet, create one when focused
-                  onFocus={async () => {
-                    if (!entry.private) {
-                      const newEntry = await createJournalEntry(entry.formatted, 'private');
-                      if (newEntry) {
-                        setJournalEntries(prev => {
-                          return prev.map(e => {
-                            if (e.formatted === entry.formatted) {
-                              return { ...e, private: newEntry };
-                            }
-                            return e;
-                          });
-                        });
-                      }
-                    }
-                  }}
-                />
-              </div>
-            </div>
+          {journalEntries.map(entry => (
+            <JournalEntry 
+              key={`journal-entry-${entry.date}`}
+              entry={entry}
+              onEntryCreated={handleEntryCreated}
+            />
           ))}
+          
+          {/* Load Earlier Button - Always shown but with different styling when no more entries */}
+          {auth_id && (
+            <div className="text-center py-4">
+              <button 
+                onClick={hasMore ? () => fetchJournalEntries(true) : undefined} 
+                className={`py-2 px-6 rounded-md transition-colors text-white ${
+                  hasMore 
+                    ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer' 
+                    : 'bg-blue-300 cursor-default'
+                }`}
+                disabled={loadingMore || !hasMore}
+              >
+                {loadingMore ? (
+                  <>
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                    Loading...
+                  </>
+                ) : hasMore ? (
+                  'Load Earlier Entries'
+                ) : (
+                  'No Earlier Entries'
+                )}
+              </button>
+            </div>
+          )}
+          
+          {/* DEV ONLY: Button to create random test entries */}
+          {developerTesting && auth_id && (
+            <div className="text-center py-4 mt-8 border-t border-gray-200">
+              <p className="text-gray-500 mb-2 text-sm">Development Testing</p>
+              <button 
+                onClick={createRandomEntries} 
+                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-6 rounded-md transition-colors"
+              >
+                Create 10 Random Test Entries
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
