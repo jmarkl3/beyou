@@ -24,6 +24,7 @@ export default function AccountPage() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [updateError, setUpdateError] = useState('');
+  const [activeSession, setActiveSession] = useState(null);
   
   // Log user data from Redux
   const logUserData = () => {
@@ -95,11 +96,88 @@ export default function AccountPage() {
   const handleGoToJournal = () => {
     router.push('/journal');
   };
+  
+  const handleJoinSession = () => {
+    if (activeSession && activeSession.meeting_url) {
+      window.open(activeSession.meeting_url, '_blank');
+    }
+  };
 
   // For debugging purposes
   useEffect(() => {
     console.log('Current user data:', userData);
   }, [userData]);
+  
+  // Check for active sessions
+  useEffect(() => {
+    if (!auth_id) return;
+    
+    const checkForActiveSessions = async () => {
+      try {
+        // Get current time
+        const now = new Date();
+        // Calculate time 1 hour ago
+        const oneHourAgo = new Date(now.getTime() - (60 * 60 * 1000));
+        
+        // Format date for comparison
+        const formattedOneHourAgo = oneHourAgo.toISOString();
+        
+        let query;
+        
+        if (userData.type === 'staff') {
+          // For staff, check sessions where they are the staff
+          query = supabase
+            .from('sessions')
+            .select('*')
+            .eq('staff_auth_id', auth_id)
+            .order('created_at', { ascending: false })
+            .limit(1);
+        } else {
+          // For clients, check sessions where they are the client
+          query = supabase
+            .from('sessions')
+            .select('*')
+            .eq('client_auth_id', auth_id)
+            .order('created_at', { ascending: false })
+            .limit(1);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('Error checking for active sessions:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          const latestSession = data[0];
+          const sessionCreatedAt = new Date(latestSession.created_at);
+          
+          // Check if session was created within the last hour
+          if (sessionCreatedAt > oneHourAgo) {
+            console.log('Active session found:', latestSession);
+            setActiveSession(latestSession);
+          } else {
+            console.log('Latest session is not active (older than 1 hour)');
+            setActiveSession(null);
+          }
+        } else {
+          console.log('No sessions found');
+          setActiveSession(null);
+        }
+      } catch (err) {
+        console.error('Error in session check:', err);
+      }
+    };
+    
+    checkForActiveSessions();
+    
+    // Set up interval to check every minute
+    const intervalId = setInterval(checkForActiveSessions, 60000);
+    
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
+  }, [auth_id, userData.type]);
 
   if (!auth_id) {
     return (
@@ -144,13 +222,21 @@ export default function AccountPage() {
           <h3 className="text-base font-semibold">Journaling</h3>
         </div>
         
-        <div className="bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white">
+        <div 
+          onClick={handleJoinSession}
+          className={`bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-opacity-95 transition-all aspect-square border border-white ${activeSession ? 'hover:shadow-xl' : 'opacity-70'}`}
+        >
           <div className="mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke={activeSession ? 'currentColor' : '#777777'}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold">Join Session</h3>
+          <h3 className={`text-base font-semibold ${activeSession ? 'text-black' : 'text-gray-600'}`}>Join Session</h3>
+          {activeSession ? (
+            <span className="text-xs text-green-600 font-medium mt-1">(Active)</span>
+          ) : (
+            <span className="text-xs text-gray-500 mt-1">(Inactive)</span>
+          )}
         </div>
         
         {userData.type === 'staff' && (

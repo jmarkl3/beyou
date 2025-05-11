@@ -36,18 +36,52 @@ const ClientSessions = () => {
     
     setSessionLoading(true);
     try {
-      const { data, error } = await supabase
+      // First, get sessions where the client is the primary client
+      const { data: primaryClientSessions, error: primaryError } = await supabase
         .from('sessions')
         .select('*')
-        .eq('client_auth_id', viewedClientId)
-        .order('datetime', { ascending: false });
+        .eq('client_auth_id', viewedClientId);
 
-      if (error) {
-        console.error('Error loading sessions:', error);
+      if (primaryError) {
+        console.error('Error loading primary client sessions:', primaryError);
         return;
       }
-
-      setSessions(data || []);
+      
+      // Next, get sessions where the client is in the additional_clients array
+      const { data: additionalClientSessions, error: additionalError } = await supabase
+        .from('sessions')
+        .select('*')
+        .contains('additional_clients', [viewedClientId]);
+        
+      if (additionalError) {
+        console.error('Error loading additional client sessions:', additionalError);
+        return;
+      }
+      
+      // Combine both sets of sessions and remove duplicates
+      const allSessions = [...(primaryClientSessions || []), ...(additionalClientSessions || [])];
+      
+      // Remove duplicates by session id
+      const uniqueSessions = allSessions.filter((session, index, self) =>
+        index === self.findIndex((s) => s.id === session.id)
+      );
+      
+      // Sort by date and time (newest first)
+      const sortedSessions = uniqueSessions.sort((a, b) => {
+        // Use created_at for sorting if available, otherwise fall back to datetime
+        const dateA = a.created_at ? new Date(a.created_at) : 
+                     (a.date && a.start_time ? new Date(`${a.date}T${a.start_time}`) : 
+                     new Date(a.datetime || 0));
+        
+        const dateB = b.created_at ? new Date(b.created_at) : 
+                     (b.date && b.start_time ? new Date(`${b.date}T${b.start_time}`) : 
+                     new Date(b.datetime || 0));
+        
+        return dateB - dateA; // Newest first
+      });
+      
+      console.log('Loaded sessions for client:', sortedSessions);
+      setSessions(sortedSessions);
     } catch (error) {
       console.error('Failed to load sessions:', error);
     } finally {
@@ -64,14 +98,22 @@ const ClientSessions = () => {
     
     setSessionLoading(true);
     try {
-      // Create a new session with current datetime and empty fields
+      // Get current date and time
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const timeStr = now.toTimeString().split(' ')[0]; // HH:MM:SS
+      
+      // Create a new session with current date/time and empty fields
       const newSession = {
-        datetime: new Date().toISOString(),
         client_auth_id: viewedClientId,
         additional_clients: [],
         staff_auth_id: userData.auth_id,
         additional_staff: [],
-        note: ''
+        note: '',
+        date: dateStr,
+        start_time: timeStr,
+        // Keep datetime for backward compatibility
+        datetime: now.toISOString()
       };
       
       console.log('Creating new session:', newSession);
@@ -111,9 +153,30 @@ const ClientSessions = () => {
     try {
       console.log(`Updating session ${sessionId}, field '${field}' to:`, value);
       
+      // If updating date or time, also update the datetime field for backward compatibility
+      let updateData = { [field]: value };
+      
+      if (field === 'date' || field === 'start_time') {
+        // Find the current session to get the other part of the datetime
+        const currentSession = sessions.find(s => s.id === sessionId);
+        if (currentSession) {
+          const date = field === 'date' ? value : (currentSession.date || new Date().toISOString().split('T')[0]);
+          const time = field === 'start_time' ? value : (currentSession.start_time || '00:00:00');
+          
+          // Create a new datetime string in ISO format
+          try {
+            const newDatetime = new Date(`${date}T${time}`).toISOString();
+            updateData.datetime = newDatetime;
+          } catch (e) {
+            console.error('Error creating datetime string:', e);
+            // Continue with the update even if datetime creation fails
+          }
+        }
+      }
+      
       const { data, error } = await supabase
         .from('sessions')
-        .update({ [field]: value })
+        .update(updateData)
         .eq('id', sessionId)
         .select();
 
@@ -124,7 +187,7 @@ const ClientSessions = () => {
 
       // Update the session in the local state
       setSessions(sessions.map(session => 
-        session.id === sessionId ? { ...session, [field]: value } : session
+        session.id === sessionId ? { ...session, ...updateData } : session
       ));
       
       console.log('Session updated successfully');
@@ -262,20 +325,53 @@ const ClientSessions = () => {
               {sessions.map((session) => (
                 <div key={session.id} className="border-b p-4 hover:bg-gray-50 last:border-b-0">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-semibold">
-                      <input 
-                        type="datetime-local" 
-                        defaultValue={new Date(session.datetime).toISOString().slice(0, 16)}
-                        onChange={(e) => {
-                          const newDate = new Date(e.target.value).toISOString();
-                          updateSession(session.id, 'datetime', newDate);
-                        }}
-                        className="p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </h4>
-                    <span className="text-xs text-gray-500">
-                      ID: {session.id}
-                    </span>
+                    <div>
+                      <h4 className="font-semibold">
+                        {/* Show date and time inputs */}
+                        <div className="flex gap-2">
+                          <input 
+                            type="date" 
+                            defaultValue={session.date || (session.datetime ? new Date(session.datetime).toISOString().split('T')[0] : '')}
+                            onChange={(e) => {
+                              updateSession(session.id, 'date', e.target.value);
+                            }}
+                            className="p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <input 
+                            type="time" 
+                            defaultValue={session.start_time || (session.datetime ? new Date(session.datetime).toTimeString().split(' ')[0] : '')}
+                            onChange={(e) => {
+                              updateSession(session.id, 'start_time', e.target.value);
+                            }}
+                            className="p-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </h4>
+                      {/* Show client role (primary or additional) */}
+                      <div className="mt-1">
+                        {session.client_auth_id === viewedClientId ? (
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-md">Primary Client</span>
+                        ) : (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-md">Additional Client</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs text-gray-500 block">
+                        ID: {session.id}
+                      </span>
+                      {/* Show meeting URL if available */}
+                      {session.meeting_url && (
+                        <a 
+                          href={session.meeting_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline block mt-1"
+                        >
+                          Join Meeting
+                        </a>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="mb-3">
